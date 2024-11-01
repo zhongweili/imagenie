@@ -16,7 +16,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('../views/RepairView.vue')
   },
   {
-    path: '/remove-bg',
+    path: '/removebg',
     name: 'RemoveBg',
     component: () => import('../views/RemoveBgView.vue')
   }

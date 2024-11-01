@@ -1,7 +1,7 @@
 <template>
-  <div class="remove-bg-view">
+  <div class="removebg-view">
     <FileSelection />
-    <FunctionSettings :mode="'remove-bg'" />
+    <FunctionSettings :mode="'removebg'" />
     <ProcessingControl />
   </div>
 </template>

@@ -10,7 +10,7 @@
         <div class="thumbnails">
           <div v-for="file in files" :key="file.path" class="thumbnail">
             <img :src="file.thumbnail" alt="thumbnail" />
-            <p>{{ file.name }}</p>
+            <p class="filename" :title="file.name">{{ truncateFilename(file.name) }}</p>
           </div>
         </div>
       </div>
@@ -21,11 +21,13 @@
   import { ref } from 'vue';
   import { open } from '@tauri-apps/plugin-dialog';
   import { readFile, BaseDirectory } from '@tauri-apps/plugin-fs';
-  
+  import { useStore } from '@/store';
   export default {
     setup() {
       const files = ref([]);
   
+      const store = useStore();
+
       const selectFiles = async () => {
         const selected = await open({
           multiple: true,
@@ -71,9 +73,14 @@
           name: path.split('/').pop(),
           thumbnail: url,
         });
+        store.addFiles(files.value);
       };
   
-      return { files, selectFiles, handleDrop };
+      const truncateFilename = (filename) => {
+        return filename.length > 15 ? filename.slice(0, 12) + '...' : filename;
+      };
+      
+      return { files, selectFiles, handleDrop, truncateFilename };
     },
   };
   </script>
@@ -95,12 +102,22 @@
   }
   .thumbnail {
     width: 100px;
-    margin: 5px;
+    margin: 8px;
     text-align: center;
+  }
+  .filename {
+    margin: 4px 0;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
   }
   .thumbnail img {
     width: 100%;
-    height: auto;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
   }
   </style>
   

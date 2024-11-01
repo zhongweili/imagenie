@@ -27,7 +27,7 @@
   
       const startProcessing = async () => {
         if (store.files.length === 0) {
-          message.value = '请先添加文件';
+          message.value = 'please select files';
           return;
         }
         isProcessing.value = true;
@@ -39,26 +39,43 @@
           progress.value = event.payload.progress;
           currentFileName.value = event.payload.fileName;
         });
-  
-        // 调用后端命令
+
         try {
-          await invoke('process_images', {
-            files: store.files.map((f) => f.path),
-            options: store.functionSettings[store.activeFunction],
-            functionName: store.activeFunction,
-          });
-          message.value = '处理完成';
+            switch (store.activeFunction) {
+                case 'compress':
+                    await invoke('process_images', {
+                        files: store.files.map((f) => f.path),
+                        options: store.functionSettings[store.activeFunction],
+                        functionName: store.activeFunction,
+                    });
+                    break;
+                case 'repair':
+                    await invoke('process_images', {
+                        files: store.files.map((f) => f.path),
+                        options: store.functionSettings[store.activeFunction],
+                        functionName: store.activeFunction,
+                    });
+                    break;
+                case 'removebg':
+                    await invoke('process_images', {
+                        files: store.files.map((f) => f.path),
+                        options: store.functionSettings[store.activeFunction],
+                        functionName: store.activeFunction,
+                    });
+                    break;
+                default:
+                break;
+            };
         } catch (error) {
-          message.value = `处理失败：${error}`;
+            console.error(error);
         } finally {
-          isProcessing.value = false;
-          unlisten();
+            isProcessing.value = false;
         }
-      };
+      }
   
       return { isProcessing, progress, currentFileName, message, startProcessing };
-    },
-  };
+    }
+  }
   </script>
   
   <style scoped>

@@ -29,57 +29,66 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed } from 'vue';
+<script>
+import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Fold, Picture, Scissor, MagicStick } from '@element-plus/icons-vue';
+import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 import { useStore } from '@/store';
 
-interface MenuItem {
-  path: string;
-  title: string;
-  icon: Component;
-}
-
-const props = defineProps<{
-  collapse: boolean;
-}>();
-
-defineEmits<{
-  (e: 'toggle-sidebar'): void;
-}>();
-
-const router = useRouter();
-const route = useRoute();
-const store = useStore();
-
-const activeRoute = computed(() => route.path);
-
-const menuItems: MenuItem[] = [
-  {
-    path: '/compress',
-    title: '批量压缩',
-    icon: Fold,
+export default {
+  components: {
+    Fold: ElementPlusIconsVue.Fold,
+    Picture: ElementPlusIconsVue.Picture,
+    Scissor: ElementPlusIconsVue.Scissor,
+    MagicStick: ElementPlusIconsVue.MagicStick
   },
-  {
-    path: '/repair',
-    title: '老照片修复',
-    icon: Picture,
+  
+  props: {
+    collapse: Boolean
   },
-  {
-    path: '/remove-bg',
-    title: '背景移除',
-    icon: Scissor,
-  },
-];
+  
+  emits: ['toggle-sidebar'],
+  
+  setup(props) {
+    const router = useRouter();
+    const route = useRoute();
+    const store = useStore();
 
-const handleSelect = (path: string) => {
-  if (path) {
-    router.push(path);
-    const functionName = path.replace('/', '');
-    store.setActiveFunction(functionName);
+    const activeRoute = computed(() => route.path);
+
+    const menuItems = [
+      {
+        path: '/compress',
+        title: '批量压缩',
+        icon: 'Fold',
+      },
+      {
+        path: '/repair',
+        title: '老照片修复',
+        icon: 'Picture',
+      },
+      {
+        path: '/removebg',
+        title: '背景移除',
+        icon: 'Scissor',
+      },
+    ];
+
+    const handleSelect = (path) => {
+      if (path) {
+        router.push(path);
+        const functionName = path.replace('/', '');
+        store.setActiveFunction(functionName);
+      }
+    };
+
+    return {
+      activeRoute,
+      menuItems,
+      handleSelect
+    };
   }
-};
+}
 </script>
 
 <style scoped lang="scss">
