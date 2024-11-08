@@ -2,19 +2,21 @@
 import { defineStore } from 'pinia';
 
 type FunctionSettings = {
-  compress: { quality: number };
-  repair: { intensity: number };
-  'removebg': { preserveDetails: boolean };
+  upscaling: { quality: number };
+  resizing: { quality: number };
+  restoration: { intensity: number };
+  'remove-background': { preserveDetails: boolean };
 }
 
 export const useStore = defineStore('main', {
   state: () => ({
-    activeFunction: 'compress' as keyof FunctionSettings,
+    activeFunction: 'upscaling' as keyof FunctionSettings,
     files: [] as File[],
     functionSettings: {
-      compress: { quality: 80 },
-      repair: { intensity: 5 },
-      'removebg': { preserveDetails: true },
+      upscaling: { quality: 80 },
+      resizing: { quality: 80 },
+      restoration: { intensity: 5 },
+      'remove-background': { preserveDetails: true },
     } as FunctionSettings,
   }),
   actions: {

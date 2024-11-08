@@ -10,8 +10,8 @@
 
     <el-container>
       <Header @toggle-sidebar="toggleSidebar" />
-      <el-main>
-        <router-view />
+      <el-main class="main-container">
+        <MainContent />
       </el-main>
     </el-container>
   </el-container>
@@ -21,7 +21,7 @@
 import { ref } from 'vue';
 import Sidebar from './Sidebar.vue';
 import Header from './Header.vue';
-
+import MainContent from './MainContent.vue';
 const isCollapse = ref(false);
 const toggleSidebar = () => {
   isCollapse.value = !isCollapse.value;
@@ -35,5 +35,11 @@ const toggleSidebar = () => {
 }
 .sidebar.collapsed {
   transform: translateX(-136px);
+}
+.main-container {
+  padding: 0;  /* 移除默认内边距以最大化内容区域 */
+  background: #f5f7fa;
+  position: relative;
+  overflow: hidden;
 }
 </style>

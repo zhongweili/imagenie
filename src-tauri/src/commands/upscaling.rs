@@ -17,7 +17,7 @@ fn get_upscale_processor() -> &'static ModelProcessor<UpscalingModel> {
 }
 
 #[tauri::command]
-pub fn upscale_image(input_path: &str, output_path: &str) -> Result<(), String> {
+pub fn upscale_image(input_path: &str, output_dir: &str) -> Result<(), String> {
     info!("upscale_image was called with path: {}", input_path);
 
     let processor = get_upscale_processor();
@@ -26,6 +26,9 @@ pub fn upscale_image(input_path: &str, output_path: &str) -> Result<(), String> 
     let image = processor
         .process_single(input_path, &params)
         .map_err(|e| e.to_string())?;
+
+    let name = Path::new(input_path).file_name().unwrap();
+    let output_path = Path::new(output_dir).join(format!("{:?}_upscaled.png", name));
     image.save(output_path).map_err(|e| e.to_string())?;
 
     Ok(())
@@ -39,15 +42,16 @@ pub fn upscale_images(input_paths: Vec<String>, output_dir: &str) -> Result<(), 
     );
 
     let processor = get_upscale_processor();
-
     let params = UpscalingParams {};
 
+    let paths_clone = input_paths.clone();
     let images = processor
         .process_batch(input_paths, &params)
         .map_err(|e| e.to_string())?;
 
     for (i, image) in images.iter().enumerate() {
-        let output_path = Path::new(output_dir).join(format!("output_{}.png", i));
+        let name = Path::new(&paths_clone[i]).file_name().unwrap();
+        let output_path = Path::new(output_dir).join(format!("{:?}_upscaled.png", name));
         image.save(&output_path).map_err(|e| e.to_string())?;
     }
 
@@ -70,17 +74,28 @@ mod tests {
     #[test]
     fn test_upscale_single_image() {
         let test_image = get_fixture_path("test.png").to_str().unwrap().to_string();
-        let test_output = get_fixture_path("output.png").to_str().unwrap().to_string();
+        let test_dir = get_fixture_path("output").to_str().unwrap().to_string();
+        if !Path::new(&test_dir).exists() {
+            std::fs::create_dir_all(&test_dir).unwrap();
+        }
 
-        let result = upscale_image(&test_image, &test_output);
+        let result = upscale_image(&test_image, &test_dir);
         assert!(result.is_ok(), "Upscaling failed: {:?}", result.err());
 
         if let Ok(()) = result {
             let input_image = image::open(&test_image).unwrap();
-            let output_image = image::open(&test_output).unwrap();
+            let output_path = std::fs::read_dir(&test_dir)
+                .unwrap()
+                .next()
+                .unwrap()
+                .unwrap()
+                .path();
+            let output_image = image::open(&output_path).unwrap();
             assert_eq!(output_image.width(), input_image.width() * 2);
             assert_eq!(output_image.height(), input_image.height() * 2);
         }
+
+        std::fs::remove_dir_all(&test_dir).unwrap();
     }
 
     #[test]
@@ -90,9 +105,11 @@ mod tests {
             get_fixture_path("test2.jpg").to_str().unwrap().to_string(),
         ];
 
-        let output_dir = get_fixture_path("output").to_str().unwrap().to_string();
-        let output_path = Path::new(&output_dir);
-        if !output_path.exists() {
+        let output_dir = get_fixture_path("output_multiple")
+            .to_str()
+            .unwrap()
+            .to_string();
+        if !Path::new(&output_dir).exists() {
             std::fs::create_dir_all(&output_dir).unwrap();
         }
 
@@ -101,8 +118,10 @@ mod tests {
 
         if let Ok(()) = result {
             assert_eq!(test_images.len(), 2);
-            assert_eq!(std::fs::read_dir(output_dir).unwrap().count(), 2);
+            assert_eq!(std::fs::read_dir(&output_dir).unwrap().count(), 2);
         }
+
+        std::fs::remove_dir_all(&output_dir).unwrap();
     }
 
     #[test]

@@ -1,7 +1,7 @@
 <template>
-  <div class="compress-view">
+  <div class="upscaling-view">
     <FileSelection />
-    <FunctionSettings :mode="'compress'" />
+    <FunctionSettings :mode="'upscaling'" />
     <ProcessingControl />
   </div>
 </template>

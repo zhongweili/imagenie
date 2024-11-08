@@ -58,17 +58,22 @@ export default {
 
     const menuItems = [
       {
-        path: '/compress',
-        title: '批量压缩',
+        path: '/upscaling',
+        title: '图像放大',
         icon: 'Fold',
       },
       {
-        path: '/repair',
-        title: '老照片修复',
+        path: '/resizing',
+        title: '图像缩放',
+        icon: 'Fold',
+      },
+      {
+        path: '/restoration',
+        title: '图像修复',
         icon: 'Picture',
       },
       {
-        path: '/removebg',
+        path: '/remove-background',
         title: '背景移除',
         icon: 'Scissor',
       },

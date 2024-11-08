@@ -1,7 +1,7 @@
 <template>
-  <div class="repair-view">
+  <div class="resizing-view">
     <FileSelection />
-    <FunctionSettings :mode="'repair'" />
+    <FunctionSettings :mode="'resizing'" />
     <ProcessingControl />
   </div>
 </template>
@@ -10,4 +10,4 @@
 import FileSelection from '@/components/FileSelection.vue';
 import FunctionSettings from '@/components/FunctionSettings.vue';
 import ProcessingControl from '@/components/ProcessingControl.vue';
-</script> 
+</script>
