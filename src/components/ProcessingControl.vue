@@ -43,24 +43,21 @@
         try {
             switch (store.activeFunction) {
                 case 'compress':
-                    await invoke('process_images', {
+                    await invoke('resize_images', {
                         files: store.files.map((f) => f.path),
                         options: store.functionSettings[store.activeFunction],
-                        functionName: store.activeFunction,
                     });
                     break;
                 case 'repair':
-                    await invoke('process_images', {
+                    await invoke('repair_images', {
                         files: store.files.map((f) => f.path),
                         options: store.functionSettings[store.activeFunction],
-                        functionName: store.activeFunction,
                     });
                     break;
                 case 'removebg':
-                    await invoke('process_images', {
+                    await invoke('remove_bg', {
                         files: store.files.map((f) => f.path),
                         options: store.functionSettings[store.activeFunction],
-                        functionName: store.activeFunction,
                     });
                     break;
                 default:
