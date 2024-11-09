@@ -8,17 +8,22 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/upscaling',
     name: 'Upscaling',
-    component: () => import('../views/UpscalingView.vue')
+    component: () => import('@/views/UpscalingView.vue')
+  },
+  {
+    path: '/resizing',
+    name: 'Resizing',
+    component: () => import('@/views/ResizingView.vue')
   },
   {
     path: '/restoration',
     name: 'Restoration',
-    component: () => import('../views/RestorationView.vue')
+    component: () => import('@/views/RestorationView.vue')
   },
   {
     path: '/remove-background',
     name: 'RemoveBackground',
-    component: () => import('../views/RemoveBackgroundView.vue')
+    component: () => import('@/views/RemoveBackgroundView.vue')
   }
 ]
 

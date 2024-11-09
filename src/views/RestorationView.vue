@@ -1,13 +1,11 @@
 <template>
   <div class="restoration-view">
-    <FileSelection />
     <FunctionSettings :mode="'restoration'" />
-    <ProcessingControl />
+    <ImageProcessor />
   </div>
 </template>
 
 <script setup lang="ts">
-import FileSelection from '@/components/FileSelection.vue';
-import FunctionSettings from '@/components/FunctionSettings.vue';
-import ProcessingControl from '@/components/ProcessingControl.vue';
+import FunctionSettings from '@/components/FunctionSettings.vue'
+import ImageProcessor from '@/components/ImageProcessor.vue'
 </script> 

@@ -33,7 +33,7 @@
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
-import { useStore } from '@/store';
+import { useStore } from '@/store/index.ts'
 
 export default {
   components: {
@@ -82,8 +82,7 @@ export default {
     const handleSelect = (path) => {
       if (path) {
         router.push(path);
-        const functionName = path.replace('/', '');
-        store.setActiveFunction(functionName);
+        store.resetState();
       }
     };
 

@@ -1,51 +1,43 @@
 <template>
     <div class="function-settings">
-      <el-form :model="settings" label-width="120px">
-        <template v-if="activeFunction === 'compress'">
-          <el-form-item label="quality">
-            <el-slider v-model="settings.quality" :min="1" :max="100"></el-slider>
-          </el-form-item>
-        </template>
-        <template v-else-if="activeFunction === 'repair'">
-          <el-form-item label="intensity">
-            <el-slider v-model="settings.intensity" :min="1" :max="10"></el-slider>
-          </el-form-item>
-        </template>
-        <template v-else-if="activeFunction === 'removebg'">
-          <el-form-item label="preserve details">
-            <el-switch v-model="settings.preserveDetails"></el-switch>
-          </el-form-item>
-        </template>
-        <!-- 可根据需要添加更多功能的设置项 -->
-      </el-form>
+      <template v-if="mode === 'upscaling'">
+        <div class="setting-item">
+          <label>放大倍数</label>
+          <select v-model="scale">
+            <option value="2">2x</option>
+            <option value="4">4x</option>
+          </select>
+        </div>
+        <!-- 其他放大相关设置 -->
+      </template>
+  
+      <template v-else-if="mode === 'restoration'">
+        <div class="setting-item">
+          <label>修复强度</label>
+          <input type="range" v-model="strength" min="0" max="100" />
+        </div>
+        <!-- 其他修复相关设置 -->
+      </template>
     </div>
   </template>
   
-<script>
-
-  import { computed } from 'vue';
-  import { useStore } from '../store';
-export default {    
-   setup() {
-    const store = useStore();
-
-    const activeFunction = computed(() => store.activeFunction);
-    
-    const settings = computed({
-      get: () => store.functionSettings[activeFunction.value],
-      set: (value) => {
-        store.functionSettings[activeFunction.value] = value;
-      },
-    });
-
-    return { activeFunction, settings };
-  }
-}
-</script>
+  <script setup lang="ts">
+  import { computed } from 'vue'
+  import { useStore } from '@/store/index.ts'
   
-  <style scoped>
-  .function-settings {
-    margin-bottom: 20px;
-  }
-  </style>
+  const props = defineProps<{
+    mode: string
+  }>()
   
+  const store = useStore()
+  
+  const scale = computed({
+    get: () => store.$state.settings.scale,
+    set: (value) => store.updateSettings({ scale: value })
+  })
+  
+  const strength = computed({
+    get: () => store.$state.settings.strength,
+    set: (value) => store.updateSettings({ strength: value })
+  })
+  </script>
