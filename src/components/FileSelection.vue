@@ -9,8 +9,8 @@
       <el-icon class="upload-icon"><Upload /></el-icon>
       <div class="upload-text">
         <em>点击或拖拽图片到此处</em>
-        <p class="output-path" v-if="outputPath">
-          输出路径: {{ outputPath }}
+        <p class="output-dir" v-if="outputDir">
+          输出路径: {{ outputDir }}
           <el-button type="text" @click.stop="selectOutputPath">修改</el-button>
         </p>
       </div>
@@ -26,7 +26,7 @@ import { save, open } from '@tauri-apps/plugin-dialog';
 import { dirname } from '@tauri-apps/api/path';
 
 const store = useStore();
-const outputPath = ref('');
+const outputDir = ref('');
 
 const handleClick = async () => {
   try {
@@ -39,10 +39,9 @@ const handleClick = async () => {
     });
 
     if (selected) {
-      outputPath.value = await dirname(selected);
-      store.addFiles([{
-        path: selected
-      }]);
+      outputDir.value = await dirname(selected);
+      store.setInputPath(selected);
+      store.setOutputDir(outputDir.value);
     }
   } catch (error) {
     console.error('文件选择错误:', error);
@@ -67,7 +66,8 @@ const selectOutputPath = async (e) => {
   });
   
   if (selected) {
-    outputPath.value = selected;
+    outputDir.value = selected;
+    store.setOutputDir(selected);
   }
 };
 </script>
@@ -101,7 +101,7 @@ const selectOutputPath = async (e) => {
   color: #909399;
 }
 
-.output-path {
+.output-dir {
   margin-top: 8px;
   font-size: 12px;
   color: #606266;

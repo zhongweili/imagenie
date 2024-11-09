@@ -71,14 +71,26 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { VideoPlay } from '@element-plus/icons-vue'
-
+import { useStore } from '../store'
+import { invoke } from '@tauri-apps/api/core';
 const isProcessing = ref(false)
 const progress = ref(0)
 const currentFileName = ref('')
+const store = useStore()
 
-const startProcessing = () => {
+const startProcessing = async () => {
   isProcessing.value = true
-  // Add your processing logic here
+  console.log(store.input_path, store.output_dir)
+  try {
+    await invoke('upscale_image', {
+      inputPath: store.input_path,
+      outputDir: store.output_dir
+    })
+  } catch (error) {
+    console.error('Upscaling failed:', error)
+  } finally {
+    isProcessing.value = false
+  }
 }
 </script>
   

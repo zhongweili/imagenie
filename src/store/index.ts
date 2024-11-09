@@ -11,7 +11,8 @@ type FunctionSettings = {
 export const useStore = defineStore('main', {
   state: () => ({
     activeFunction: 'upscaling' as keyof FunctionSettings,
-    files: [] as File[],
+    input_path: '',
+    output_dir: '',
     functionSettings: {
       upscaling: { quality: 80 },
       resizing: { quality: 80 },
@@ -23,11 +24,11 @@ export const useStore = defineStore('main', {
     setActiveFunction(name: keyof FunctionSettings) {
       this.activeFunction = name;
     },
-    addFiles(newFiles: any) {
-      this.files = [...this.files, ...newFiles];
+    setInputPath(path: string) {
+      this.input_path = path;
     },
-    clearFiles() {
-      this.files = [];
-    },
+    setOutputDir(dir: string) {
+      this.output_dir = dir;
+    }
   },
 });

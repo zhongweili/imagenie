@@ -11,7 +11,7 @@
     <el-container>
       <Header @toggle-sidebar="toggleSidebar" />
       <el-main class="main-container">
-        <MainContent />
+        <router-view />
       </el-main>
     </el-container>
   </el-container>
@@ -21,7 +21,6 @@
 import { ref } from 'vue';
 import Sidebar from './Sidebar.vue';
 import Header from './Header.vue';
-import MainContent from './MainContent.vue';
 const isCollapse = ref(false);
 const toggleSidebar = () => {
   isCollapse.value = !isCollapse.value;

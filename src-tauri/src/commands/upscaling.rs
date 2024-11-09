@@ -17,7 +17,7 @@ fn get_upscale_processor() -> &'static ModelProcessor<UpscalingModel> {
 }
 
 #[tauri::command]
-pub fn upscale_image(input_path: &str, output_dir: &str) -> Result<(), String> {
+pub async fn upscale_image(input_path: &str, output_dir: &str) -> Result<(), String> {
     info!("upscale_image was called with path: {}", input_path);
 
     let processor = get_upscale_processor();
@@ -27,15 +27,24 @@ pub fn upscale_image(input_path: &str, output_dir: &str) -> Result<(), String> {
         .process_single(input_path, &params)
         .map_err(|e| e.to_string())?;
 
-    let name = Path::new(input_path).file_name().unwrap();
-    let output_path = Path::new(output_dir).join(format!("{:?}_upscaled.png", name));
+    let name = Path::new(input_path)
+        .file_name()
+        .unwrap()
+        .to_string_lossy()
+        .into_owned();
+    let name = name
+        .strip_suffix(".png")
+        .or_else(|| name.strip_suffix(".jpg"))
+        .or_else(|| name.strip_suffix(".jpeg"))
+        .unwrap_or(&name);
+    let output_path = Path::new(output_dir).join(format!("{}_upscaled.png", name));
     image.save(output_path).map_err(|e| e.to_string())?;
 
     Ok(())
 }
 
 #[tauri::command]
-pub fn upscale_images(input_paths: Vec<String>, output_dir: &str) -> Result<(), String> {
+pub async fn upscale_images(input_paths: Vec<String>, output_dir: &str) -> Result<(), String> {
     info!(
         "upscale_images was called with {} images",
         input_paths.len()
@@ -50,8 +59,17 @@ pub fn upscale_images(input_paths: Vec<String>, output_dir: &str) -> Result<(), 
         .map_err(|e| e.to_string())?;
 
     for (i, image) in images.iter().enumerate() {
-        let name = Path::new(&paths_clone[i]).file_name().unwrap();
-        let output_path = Path::new(output_dir).join(format!("{:?}_upscaled.png", name));
+        let name = Path::new(&paths_clone[i])
+            .file_name()
+            .unwrap()
+            .to_string_lossy()
+            .into_owned();
+        let name = name
+            .strip_suffix(".png")
+            .or_else(|| name.strip_suffix(".jpg"))
+            .or_else(|| name.strip_suffix(".jpeg"))
+            .unwrap_or(&name);
+        let output_path = Path::new(output_dir).join(format!("{}_upscaled.png", name));
         image.save(&output_path).map_err(|e| e.to_string())?;
     }
 
@@ -71,15 +89,15 @@ mod tests {
         path
     }
 
-    #[test]
-    fn test_upscale_single_image() {
+    #[tokio::test]
+    async fn test_upscale_single_image() {
         let test_image = get_fixture_path("test.png").to_str().unwrap().to_string();
         let test_dir = get_fixture_path("output").to_str().unwrap().to_string();
         if !Path::new(&test_dir).exists() {
             std::fs::create_dir_all(&test_dir).unwrap();
         }
 
-        let result = upscale_image(&test_image, &test_dir);
+        let result = upscale_image(&test_image, &test_dir).await;
         assert!(result.is_ok(), "Upscaling failed: {:?}", result.err());
 
         if let Ok(()) = result {
@@ -98,8 +116,8 @@ mod tests {
         std::fs::remove_dir_all(&test_dir).unwrap();
     }
 
-    #[test]
-    fn test_upscale_multiple_images() {
+    #[tokio::test]
+    async fn test_upscale_multiple_images() {
         let test_images = vec![
             get_fixture_path("test1.jpg").to_str().unwrap().to_string(),
             get_fixture_path("test2.jpg").to_str().unwrap().to_string(),
@@ -113,7 +131,7 @@ mod tests {
             std::fs::create_dir_all(&output_dir).unwrap();
         }
 
-        let result = upscale_images(test_images.clone(), &output_dir);
+        let result = upscale_images(test_images.clone(), &output_dir).await;
         assert!(result.is_ok(), "Batch upscaling failed: {:?}", result.err());
 
         if let Ok(()) = result {
@@ -124,9 +142,9 @@ mod tests {
         std::fs::remove_dir_all(&output_dir).unwrap();
     }
 
-    #[test]
-    fn test_upscale_invalid_path() {
-        let result = upscale_image("nonexistent.jpg", "output.png");
+    #[tokio::test]
+    async fn test_upscale_invalid_path() {
+        let result = upscale_image("nonexistent.jpg", "output.png").await;
         assert!(result.is_err());
     }
 }
