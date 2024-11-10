@@ -60,6 +60,7 @@ const selectInputFile = async () => {
   }
 }
 
+// TODO need to switch to tauri DRAG_DROP event
 const handleDrop = async (event: DragEvent) => {
   event.preventDefault()
   const file = event.dataTransfer?.files[0]
@@ -99,15 +100,29 @@ const startProcessing = async () => {
 </script>
 
 <style scoped>
+/* 确保整个应用容器有高度 */
+:root, body, #app {
+  height: 100vh;
+}
+
 .image-processor {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  height: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .image-display {
   flex: 1;
-  min-height: 300px;
+  background-color: #f5f5f5;
+  width: 100%;
+  border-radius: 8px;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
 }
 
 .drop-zone {
@@ -118,6 +133,22 @@ const startProcessing = async () => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.drop-zone img {
+  min-width: min(100%, calc(100vh * 0.7));
+  min-height: 100%;
+  width: auto;
+  height: 100%;
+  object-fit: contain;
+  margin: 0;
+  padding: 0;
+}
+
+.placeholder {
+  color: #666;
 }
 
 .controls {

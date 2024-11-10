@@ -36,9 +36,12 @@ const toggleSidebar = () => {
   transform: translateX(-136px);
 }
 .main-container {
-  padding: 0;  /* 移除默认内边距以最大化内容区域 */
+  padding: 0;
   background: #f5f7fa;
   position: relative;
   overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 </style>
