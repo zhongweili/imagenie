@@ -136,11 +136,19 @@ const selectOutputDir = async () => {
   }
 }
 
+// 添加 props 定义
+interface Props {
+  mode: 'upscaling' | 'restoration'
+}
+const props = defineProps<Props>()
+
 const startProcessing = async () => {
   isProcessing.value = true
   console.log(store.inputPath, store.outputDir)
   try {
-    const outputPath = await invoke('upscale_image', {
+    // 根据 mode 调用不同的处理函数
+    const command = props.mode === 'upscaling' ? 'upscale_image' : 'face_restoration'
+    const outputPath = await invoke(command, {
       inputPath: store.inputPath,
       outputDir: store.outputDir
     })
@@ -150,7 +158,7 @@ const startProcessing = async () => {
       '图片处理完成'
     )
   } catch (error) {
-    console.error('Upscaling failed:', error)
+    console.error('Processing failed:', error)
   } finally {
     isProcessing.value = false
   }

@@ -23,9 +23,10 @@ impl<M: ImageModel + Send + Sync> ModelProcessor<M> {
         image_path: &str,
         params: &M::Params,
     ) -> Result<DynamicImage, ImageProcessingError> {
-        let input = M::preprocess(image_path, params)?;
+        let mut params = params.clone();
+        let input = M::preprocess(image_path, &mut params)?;
         let output = M::process(&self.session, &input)?;
-        M::postprocess(&output, params)
+        M::postprocess(&output, &params)
     }
 
     pub fn process_batch<I>(

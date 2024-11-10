@@ -4,7 +4,9 @@ mod utils;
 
 use std::error::Error;
 
-use commands::upscaling::{upscale_image, upscale_images};
+use commands::{
+    face_restoration::face_restoration, upscaling::upscale_image, upscaling::upscale_images,
+};
 use tauri::{
     menu::{CheckMenuItem, Menu, MenuItem, SubmenuBuilder},
     tray::{MouseButton, TrayIconBuilder, TrayIconEvent},
@@ -25,7 +27,11 @@ pub fn app() -> anyhow::Result<Builder<Wry>> {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_fs::init())
-        .invoke_handler(tauri::generate_handler![upscale_image, upscale_images])
+        .invoke_handler(tauri::generate_handler![
+            face_restoration,
+            upscale_image,
+            upscale_images
+        ])
         .setup(setup)
         .on_page_load(page_load_handler)
         .on_window_event(window_event_handler);

@@ -2,7 +2,7 @@
   <div class="resizing-view">
     <div class="layout">
       <FunctionSettings :mode="'resizing'" class="settings" />
-      <ImageProcessor class="processor" />
+      <ImageProcessor :mode="'resizing'" class="processor" />
     </div>
   </div>
 </template>

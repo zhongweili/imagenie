@@ -1,7 +1,26 @@
 use ndarray::ArrayBase;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct UpscalingParams {}
+
+#[derive(Clone)]
+pub struct FaceRestorationParams {
+    pub face_size: u32,
+    pub upscale_factor: u32,
+    pub original_width: Option<u32>,
+    pub original_height: Option<u32>,
+}
+
+impl Default for FaceRestorationParams {
+    fn default() -> Self {
+        Self {
+            face_size: 512,
+            upscale_factor: 2,
+            original_width: None,
+            original_height: None,
+        }
+    }
+}
 
 // Define concrete tensor types
 pub type TensorInput<T> = ArrayBase<ndarray::OwnedRepr<T>, ndarray::Dim<[usize; 4]>>;

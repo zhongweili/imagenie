@@ -1,7 +1,7 @@
 <template>
   <div class="upscaling-view">
     <FunctionSettings :mode="'upscaling'" />
-    <ImageProcessor />
+    <ImageProcessor :mode="'upscaling'" />
   </div>
 </template>
 

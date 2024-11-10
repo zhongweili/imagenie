@@ -1,7 +1,7 @@
 <template>
   <div class="remove-background-view">
     <FunctionSettings :mode="'remove-background'" />
-    <ImageProcessor />
+    <ImageProcessor :mode="'remove-background'" />
   </div>
 </template>
 
