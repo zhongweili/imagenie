@@ -10,6 +10,6 @@
     "shell:allow-open",
     "dialog:default",
     "fs:default",
-    "dialog:default"
+    "notification:default"
   ]
 }

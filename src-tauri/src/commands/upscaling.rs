@@ -17,7 +17,7 @@ fn get_upscale_processor() -> &'static ModelProcessor<UpscalingModel> {
 }
 
 #[tauri::command]
-pub async fn upscale_image(input_path: &str, output_dir: &str) -> Result<(), String> {
+pub async fn upscale_image(input_path: &str, output_dir: &str) -> Result<String, String> {
     info!("upscale_image was called with path: {}", input_path);
 
     let processor = get_upscale_processor();
@@ -38,9 +38,9 @@ pub async fn upscale_image(input_path: &str, output_dir: &str) -> Result<(), Str
         .or_else(|| name.strip_suffix(".jpeg"))
         .unwrap_or(&name);
     let output_path = Path::new(output_dir).join(format!("{}_upscaled.png", name));
-    image.save(output_path).map_err(|e| e.to_string())?;
+    image.save(&output_path).map_err(|e| e.to_string())?;
 
-    Ok(())
+    Ok(output_path.to_str().unwrap().to_string())
 }
 
 #[tauri::command]
@@ -100,7 +100,7 @@ mod tests {
         let result = upscale_image(&test_image, &test_dir).await;
         assert!(result.is_ok(), "Upscaling failed: {:?}", result.err());
 
-        if let Ok(()) = result {
+        if let Ok(output) = result {
             let input_image = image::open(&test_image).unwrap();
             let output_path = std::fs::read_dir(&test_dir)
                 .unwrap()
@@ -111,6 +111,7 @@ mod tests {
             let output_image = image::open(&output_path).unwrap();
             assert_eq!(output_image.width(), input_image.width() * 2);
             assert_eq!(output_image.height(), input_image.height() * 2);
+            assert_eq!(output, output_path.to_str().unwrap().to_string());
         }
 
         std::fs::remove_dir_all(&test_dir).unwrap();

@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 
 interface State {
   inputPath: string | null
-  outputPath: string | null
+  outputDir: string | null
   inputImage: string | null
   settings: {
     scale: number
@@ -14,7 +14,7 @@ interface State {
 export const useStore = defineStore('main', {
   state: (): State => ({
     inputPath: null,
-    outputPath: null,
+    outputDir: null,
     inputImage: null,
     settings: {
       scale: 2,
@@ -25,7 +25,7 @@ export const useStore = defineStore('main', {
   actions: {
     resetState() {
       this.inputPath = null
-      this.outputPath = null
+      this.outputDir = null
       this.inputImage = null
       this.settings = {
         scale: 2,
@@ -46,10 +46,10 @@ export const useStore = defineStore('main', {
     },
 
     async setOutputDir(dir: string) {
-      this.outputPath = dir
+      this.outputDir = dir
     },
 
-    async selectOutputPath() {
+    async selectOutputDir() {
       // 选择输出路径...
     },
 
