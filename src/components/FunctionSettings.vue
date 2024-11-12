@@ -2,7 +2,7 @@
     <div class="function-settings">
       <template v-if="mode === 'upscaling'">
         <div class="setting-item">
-          <label>放大倍数</label>
+          <label>{{ t('function.scale') }}</label>
           <select v-model="scale">
             <option value="2">2x</option>
             <option value="4">4x</option>
@@ -13,7 +13,7 @@
   
       <template v-else-if="mode === 'restoration'">
         <div class="setting-item">
-          <label>修复强度</label>
+          <label>{{ t('function.strength') }}</label>
           <input type="range" v-model="strength" min="0" max="100" />
         </div>
         <!-- 其他修复相关设置 -->
@@ -24,6 +24,9 @@
   <script setup lang="ts">
   import { computed } from 'vue'
   import { useStore } from '@/store/index.ts'
+  import { useI18n } from 'vue-i18n'
+  
+  const { t } = useI18n()
   
   const props = defineProps<{
     mode: string

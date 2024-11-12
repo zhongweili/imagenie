@@ -5,18 +5,10 @@
   </main>
 </template>
 
-<script>
-import MainLayout from './components/MainLayout.vue';
-
-export default {
-  name: 'App',
-  components: {
-    MainLayout,
-  },
-};
+<script setup lang="ts">
+import MainLayout from '@/components/MainLayout.vue';
 </script>
 
 <style>
-/* 可在此处引入全局样式 */
 @import './assets/styles.css';
 </style>

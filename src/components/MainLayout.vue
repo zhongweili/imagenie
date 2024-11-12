@@ -4,6 +4,7 @@
     <el-aside
       :width="isCollapse ? '64px' : '200px'"
       class="main-layout__aside"
+      :title="t('layout.sidebar')"
     >
       <Sidebar :collapse="isCollapse" @toggle-sidebar="toggleSidebar" />
     </el-aside>
@@ -19,12 +20,15 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n'
 import Sidebar from '@/components/Sidebar.vue';
 import Header from '@/components/Header.vue';
 const isCollapse = ref(false);
 const toggleSidebar = () => {
   isCollapse.value = !isCollapse.value;
 };
+
+const { t } = useI18n()
 </script>
 
 <style>

@@ -19,7 +19,7 @@
           />
         </div>
         <div v-else class="upload-placeholder">
-          <span>拖拽图片到这里或点击选择</span>
+          <span>{{ t('imageProcessor.dropHint') }}</span>
         </div>
       </div>
 
@@ -57,25 +57,25 @@
         class="control-button"
         @click="selectInputFile"
       >
-        选择输入图片
+        {{ t('imageProcessor.selectInput') }}
       </button>
       <button 
         class="control-button"
         @click="selectOutputDir"
       >
-        选择输出路径
+        {{ t('imageProcessor.selectOutput') }}
       </button>
       <button 
         class="control-button primary"
         @click="startProcessing"
         :disabled="!canProcess || isProcessing"
       >
-        {{ isProcessing ? '处理中...' : '开始处理' }}
+        {{ isProcessing ? t('imageProcessor.processing') : t('imageProcessor.startProcess') }}
       </button>
     </div>
     
     <div v-if="isProcessing" class="processing-status">
-      正在处理图片，请稍候...
+      {{ t('imageProcessor.processingStatus') }}
     </div>
   </div>
 </template>
@@ -88,6 +88,7 @@ import {  open } from '@tauri-apps/plugin-dialog';
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { appDataDir, join } from '@tauri-apps/api/path';
 import { enqueueNotification } from '@/helpers/tauriNotification';
+import { useI18n } from 'vue-i18n'
 
 const store = useStore()
 const isProcessing = ref(false)
@@ -138,7 +139,7 @@ const selectOutputDir = async () => {
 
 // 添加 props 定义
 interface Props {
-  mode: 'upscaling' | 'restoration'
+  mode: 'upscaling' | 'restoration' | 'remove-background' | 'resizing'
 }
 const props = defineProps<Props>()
 
@@ -251,6 +252,8 @@ onMounted(() => {
     resizeTimeout = window.setTimeout(handleImageLoad, 100)
   })
 })
+
+const { t } = useI18n()
 </script>
 
 <style scoped>

@@ -1,8 +1,7 @@
 <template>
   <div class="sidebar" :class="{ 'sidebar--collapsed': collapse }">
     <div class="sidebar__logo" @click="$emit('toggle-sidebar')">
-      <el-icon class="sidebar__logo-icon"><MagicStick /></el-icon>
-      <span class="sidebar__logo-text" v-show="!collapse">Imagenie</span>
+      <span class="sidebar__logo-text" v-show="!collapse">{{ t('sidebar.title') }}</span>
     </div>
 
     <el-menu
@@ -23,76 +22,80 @@
         :route="item.path"
       >
         <el-icon><component :is="item.icon" /></el-icon>
-        <template #title>{{ item.title }}</template>
+        <template #title>{{ t(item.titleKey) }}</template>
       </el-menu-item>
     </el-menu>
+
+    <div class="sidebar__bottom">
+      <button @click="toggleLanguage" class="lang-switch">
+        {{ locale === 'en' ? '中文' : 'English' }}
+      </button>
+    </div>
   </div>
 </template>
 
-<script>
-import { computed } from 'vue';
+<script setup lang="ts">
+import { computed, getCurrentInstance } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 import { useStore } from '@/store/index.ts'
 
-export default {
-  components: {
-    Fold: ElementPlusIconsVue.Fold,
-    Picture: ElementPlusIconsVue.Picture,
-    Scissor: ElementPlusIconsVue.Scissor,
-    MagicStick: ElementPlusIconsVue.MagicStick
-  },
-  
-  props: {
-    collapse: Boolean
-  },
-  
-  emits: ['toggle-sidebar'],
-  
-  setup(props) {
-    const router = useRouter();
-    const route = useRoute();
-    const store = useStore();
+const { t } = useI18n()
+const router = useRouter();
+const route = useRoute();
+const store = useStore();
 
-    const activeRoute = computed(() => route.path);
-
-    const menuItems = [
-      {
-        path: '/upscaling',
-        title: '图像放大',
-        icon: 'Fold',
-      },
-      {
-        path: '/resizing',
-        title: '图像缩放',
-        icon: 'Fold',
-      },
-      {
-        path: '/restoration',
-        title: '图像修复',
-        icon: 'Picture',
-      },
-      {
-        path: '/remove-background',
-        title: '背景移除',
-        icon: 'Scissor',
-      },
-    ];
-
-    const handleSelect = (path) => {
-      if (path) {
-        router.push(path);
-        store.resetState();
-      }
-    };
-
-    return {
-      activeRoute,
-      menuItems,
-      handleSelect
-    };
+// Register all icons globally
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  const app = getCurrentInstance()
+  if (app && typeof component === 'object') {
+    app.appContext.app.component(key, component)
   }
 }
+
+const props = defineProps<{
+  collapse: boolean
+}>()
+
+const { locale } = useI18n()
+const toggleLanguage = () => {
+  locale.value = locale.value === 'en' ? 'zh' : 'en'
+}
+
+defineEmits(['toggle-sidebar'])
+
+const activeRoute = computed(() => route.path);
+
+const menuItems = [
+  {
+    path: '/upscaling',
+    titleKey: 'sidebar.menu.upscaling',
+    icon: 'Fold',
+  },
+  {
+    path: '/resizing',
+    titleKey: 'sidebar.menu.resizing',
+    icon: 'Fold',
+  },
+  {
+    path: '/restoration',
+    titleKey: 'sidebar.menu.restoration',
+    icon: 'Picture',
+  },
+  {
+    path: '/remove-background',
+    titleKey: 'sidebar.menu.removeBackground',
+    icon: 'Scissor',
+  },
+];
+
+const handleSelect = (path: string) => {
+  if (path) {
+    router.push(path);
+    store.resetState();
+  }
+};
 </script>
 
 <style scoped lang="scss">
@@ -102,27 +105,53 @@ export default {
   height: 100%;
   background-color: #333;
   transition: width 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   
   &--collapsed {
     width: 64px;
     
     #{$self}__logo {
-      padding: 0 20px;
+      padding: 0;
+      justify-content: center;
+      
+      .collapse-icon {
+        margin: 0;
+      }
+    }
+
+    .lang-switch {
+      display: none;
+    }
+
+    #{$self}__logo-text {
+      display: none;
+    }
+
+    .sidebar__bottom {
+      padding: 8px 0;
+      display: flex;
+      justify-content: center;
+      
+      .lang-switch {
+        width: auto;
+        padding: 8px 0;
+      }
     }
   }
 
   &__logo {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
     height: 64px;
     padding: 0 20px;
     cursor: pointer;
-    transition: padding 0.3s ease;
+    transition: all 0.3s ease;
 
-    &-icon {
-      font-size: 24px;
-      color: #fff;
+    &:hover {
+      background-color: #444;
     }
 
     &-text {
@@ -130,10 +159,12 @@ export default {
       font-size: 18px;
       font-weight: 600;
       white-space: nowrap;
+      text-align: center;
     }
   }
 
   &__menu {
+    flex: 1;
     border-right: none;
     
     :deep(.el-menu-item) {
@@ -146,6 +177,39 @@ export default {
       }
     }
   }
+
+  &__bottom {
+    padding: 16px;
+    border-top: 1px solid #444;
+    
+    .lang-switch {
+      width: 100%;
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+      
+      &:hover {
+        background-color: #444;
+      }
+    }
+  }
+
+  .collapse-icon {
+    cursor: pointer;
+    font-size: 20px;
+    color: #fff;
+    transition: transform 0.3s;
+    position: absolute;
+    right: 12px;
+    
+    &:hover {
+      color: #ffd04b;
+    }
+  }
 }
 
 // Override element-plus styles
@@ -155,5 +219,18 @@ export default {
 
 :deep(.el-icon > svg) {
   fill: currentColor;
+}
+
+.lang-switch {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  
+  &:hover {
+    background-color: #444;
+  }
 }
 </style>

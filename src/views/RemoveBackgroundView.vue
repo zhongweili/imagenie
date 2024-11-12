@@ -8,4 +8,5 @@
 <script setup lang="ts">
 import FunctionSettings from '@/components/FunctionSettings.vue'
 import ImageProcessor from '@/components/ImageProcessor.vue'
+
 </script> 
