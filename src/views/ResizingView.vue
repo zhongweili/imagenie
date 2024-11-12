@@ -16,7 +16,7 @@ import ImageProcessor from '@/components/ImageProcessor.vue'
 const store = useStore()
 
 onBeforeMount(() => {
-  // 在视图加载前重置状态
+  // Reset the status before the view is loaded
   store.resetState()
 })
 </script>

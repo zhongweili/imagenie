@@ -101,7 +101,9 @@ const messages = {
       selectOutput: '选择输出路径',
       startProcess: '开始处理',
       processing: '处理中...',
-      processingStatus: '正在处理图片，请稍候...'
+      processingStatus: '正在处理图片，请稍候...',
+      processingCompleted: '处理完成',
+      processingCompletedDesc: '处理完成，请对比查看结果'     
     },
     sidebar: {
       title: 'Imagenie',

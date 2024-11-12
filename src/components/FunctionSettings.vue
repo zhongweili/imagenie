@@ -8,7 +8,6 @@
             <option value="4">4x</option>
           </select>
         </div>
-        <!-- 其他放大相关设置 -->
       </template>
   
       <template v-else-if="mode === 'restoration'">
@@ -16,7 +15,6 @@
           <label>{{ t('function.strength') }}</label>
           <input type="range" v-model="strength" min="0" max="100" />
         </div>
-        <!-- 其他修复相关设置 -->
       </template>
     </div>
   </template>

@@ -1,7 +1,7 @@
 <template>
   <div class="image-processor">
     <div class="image-container">
-      <!-- 上传区域 -->
+      <!-- Upload Area -->
       <div 
         v-if="!processedImageUrl"
         class="upload-zone"
@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <!-- 对比区域 -->
+      <!-- Comparison Area -->
       <div v-else class="comparison-container">
         <div class="comparison-wrapper" ref="comparisonWrapper">
           <div class="comparison-content">
@@ -137,7 +137,6 @@ const selectOutputDir = async () => {
   }
 }
 
-// 添加 props 定义
 interface Props {
   mode: 'upscaling' | 'restoration' | 'remove-background' | 'resizing'
 }
@@ -147,7 +146,6 @@ const startProcessing = async () => {
   isProcessing.value = true
   console.log(store.inputPath, store.outputDir)
   try {
-    // 根据 mode 调用不同的处理函数
     const command = props.mode === 'upscaling' ? 'upscale_image' : 'face_restoration'
     const outputPath = await invoke(command, {
       inputPath: store.inputPath,
@@ -155,8 +153,8 @@ const startProcessing = async () => {
     })
     processedImageUrl.value = convertFileSrc(outputPath as string)
     enqueueNotification(
-      '图片处理完成',
-      '图片处理完成'
+      t('imageProcessor.processingCompleted'),
+      t('imageProcessor.processingCompletedDesc')
     )
   } catch (error) {
     console.error('Processing failed:', error)
@@ -165,15 +163,12 @@ const startProcessing = async () => {
   }
 }
 
-// 新增的图片尺寸处理逻辑
 const originalImage = ref<HTMLImageElement | null>(null)
 const processedImage = ref<HTMLImageElement | null>(null)
 const comparisonWrapper = ref<HTMLElement | null>(null)
 
-// 添加预览图片的引用
 const previewImage = ref<HTMLImageElement | null>(null)
 
-// 处理预览图片加载
 const handlePreviewImageLoad = () => {
   if (!previewImage.value) return
   
@@ -188,11 +183,9 @@ const handlePreviewImageLoad = () => {
 
   let displayWidth, displayHeight
   if (containerRatio > imgRatio) {
-    // 容器更宽，以高度为基准
     displayHeight = containerHeight
     displayWidth = displayHeight * imgRatio
   } else {
-    // 容器更高，以宽度为基准
     displayWidth = containerWidth
     displayHeight = displayWidth / imgRatio
   }
@@ -201,7 +194,6 @@ const handlePreviewImageLoad = () => {
   img.style.height = `${displayHeight}px`
 }
 
-// 修改原有的图片加载处理函数
 const handleImageLoad = () => {
   if (!originalImage.value || !processedImage.value || !comparisonWrapper.value) return
 
@@ -211,7 +203,7 @@ const handleImageLoad = () => {
   const img1 = originalImage.value
   const img2 = processedImage.value
 
-  // 确保两张图片都已加载完成
+  // Make sure that both pictures have been loaded
   if (!img1.complete || !img2.complete) {
     setTimeout(handleImageLoad, 100)
     return
@@ -230,7 +222,6 @@ const handleImageLoad = () => {
     displayHeight = displayWidth / targetRatio
   }
 
-  // 更新comparison-content的尺寸，添加类型断言
   const contentElement = comparisonWrapper.value.querySelector('.comparison-content') as HTMLElement
   if (contentElement) {
     contentElement.style.width = `${displayWidth}px`
@@ -244,7 +235,7 @@ const handleImageLoad = () => {
   })
 }
 
-// 监听窗口大小变化，重新计算图片尺寸
+// Listen for window size changes and recalculate image size
 let resizeTimeout: number
 onMounted(() => {
   window.addEventListener('resize', () => {
@@ -273,7 +264,6 @@ const { t } = useI18n()
   background-color: #f5f5f5;
 }
 
-/* 上传区域样式 */
 .upload-zone {
   width: 100%;
   height: 100%;
@@ -301,7 +291,6 @@ const { t } = useI18n()
   object-fit: contain;
 }
 
-/* 对比区域样式 */
 .comparison-container {
   width: 100%;
   height: 100%;
@@ -356,7 +345,6 @@ const { t } = useI18n()
   transition: width 0.3s ease, height 0.3s ease;
 }
 
-/* 控制面板样式 */
 .control-panel {
   display: flex;
   gap: 1rem;

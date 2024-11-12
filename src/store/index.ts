@@ -47,14 +47,6 @@ export const useStore = defineStore('main', {
 
     async setOutputDir(dir: string) {
       this.outputDir = dir
-    },
-
-    async selectOutputDir() {
-      // 选择输出路径...
-    },
-
-    async startProcessing() {
-      // 开始处理图片...
     }
   }
 })

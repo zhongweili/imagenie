@@ -103,11 +103,11 @@ impl ImageModel for FaceRestorationModel<f32> {
     ) -> Result<TensorInput<Self::InputType>, ImageProcessingError> {
         let image = image::open(image_path)?;
 
-        // 保存原始尺寸
+        // Save the original size
         params.original_width = Some(image.width());
         params.original_height = Some(image.height());
 
-        // 保持长宽比的情况下调整到合适大小
+        // Adjusting to the right size while maintaining the aspect ratio
         let mut resized = if image.width() > image.height() {
             let new_width =
                 (params.face_size as f32 * image.width() as f32 / image.height() as f32) as u32;
@@ -126,13 +126,13 @@ impl ImageModel for FaceRestorationModel<f32> {
             )
         };
 
-        // 居中裁剪到 512x512
+        // Center crop to 512x512
         let cropped = if resized.width() > params.face_size || resized.height() > params.face_size {
             let x = (resized.width() - params.face_size) / 2;
             let y = (resized.height() - params.face_size) / 2;
             resized.crop(x, y, params.face_size, params.face_size)
         } else {
-            // 如果图片太小，在边缘填充
+            // If the picture is too small, fill in the edge.
             let mut buffer = image::RgbImage::new(params.face_size, params.face_size);
             let x = (params.face_size - resized.width()) / 2;
             let y = (params.face_size - resized.height()) / 2;
@@ -163,7 +163,7 @@ impl ImageModel for FaceRestorationModel<f32> {
         let (_, _, h, w) = output.dim();
         let mut img_buffer = image::RgbImage::new(w as u32, h as u32);
 
-        // 先转换像素值
+        // Convert the pixel value first
         for y in 0..h {
             for x in 0..w {
                 let to_u8 = |v: f32| {
@@ -181,7 +181,7 @@ impl ImageModel for FaceRestorationModel<f32> {
 
         let mut result = DynamicImage::ImageRgb8(img_buffer);
 
-        // 如果有原始尺寸信息，将图片调整回原始尺寸
+        // If there is original size information, adjust the picture back to the original size.
         if let (Some(original_width), Some(original_height)) =
             (params.original_width, params.original_height)
         {
