@@ -31,13 +31,13 @@ repos:
         language: rust
         files: \.rs$
         args: []
-      # - id: cargo-deny
-      #   name: cargo deny check
-      #   description: Check cargo dependencies
-      #   entry: bash -c 'cd src-tauri && cargo deny check -d'
-      #   language: rust
-      #   files: \.rs$
-      #   args: []
+      - id: cargo-deny
+        name: cargo deny check
+        description: Check cargo dependencies
+        entry: bash -c 'cd src-tauri && cargo deny check -d'
+        language: rust
+        files: \.rs$
+        args: []
       - id: typos
         name: typos
         description: check typo
