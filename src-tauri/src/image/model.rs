@@ -40,7 +40,7 @@ impl ImageModel for UpscalingModel<half::f16> {
             .with_optimization_level(GraphOptimizationLevel::Level3)?
             .with_intra_threads(4)?
             .commit_from_file(model_path)
-            .map_err(|e| ImageProcessingError::OrtError(e.to_string()))
+            .map_err(|e| ImageProcessingError::Ort(e.to_string()))
     }
 
     fn preprocess(
@@ -67,9 +67,9 @@ impl ImageModel for UpscalingModel<half::f16> {
         let inputs = inputs![input_value]?;
 
         let outputs = session.run(inputs)?;
-        let output = outputs.get("output").ok_or_else(|| {
-            ImageProcessingError::ProcessingError("No output from model".to_string())
-        })?;
+        let output = outputs
+            .get("output")
+            .ok_or_else(|| ImageProcessingError::Processing("No output from model".to_string()))?;
 
         let output_tensor = output.try_extract_tensor::<Self::InputType>()?;
         let output_shape = output_tensor.shape();
@@ -78,7 +78,7 @@ impl ImageModel for UpscalingModel<half::f16> {
             (1, 3, output_shape[2], output_shape[3]),
             output_tensor.as_slice().unwrap().to_vec(),
         )
-        .map_err(|e| ImageProcessingError::ProcessingError(e.to_string()))
+        .map_err(|e| ImageProcessingError::Processing(e.to_string()))
     }
 }
 
@@ -94,7 +94,7 @@ impl ImageModel for FaceRestorationModel<f32> {
             .with_optimization_level(GraphOptimizationLevel::Level3)?
             .with_intra_threads(4)?
             .commit_from_file(model_path)
-            .map_err(|e| ImageProcessingError::OrtError(e.to_string()))
+            .map_err(|e| ImageProcessingError::Ort(e.to_string()))
     }
 
     fn preprocess(
@@ -204,9 +204,10 @@ impl ImageModel for FaceRestorationModel<f32> {
         let inputs = inputs![input_value]?;
 
         let outputs = session.run(inputs)?;
-        let output = outputs.values().next().ok_or_else(|| {
-            ImageProcessingError::ProcessingError("No output from model".to_string())
-        })?;
+        let output = outputs
+            .values()
+            .next()
+            .ok_or_else(|| ImageProcessingError::Processing("No output from model".to_string()))?;
 
         let output_tensor = output.try_extract_tensor::<Self::InputType>()?;
         let output_shape = output_tensor.shape();
@@ -215,6 +216,6 @@ impl ImageModel for FaceRestorationModel<f32> {
             (1, 3, output_shape[2], output_shape[3]),
             output_tensor.as_slice().unwrap().to_vec(),
         )
-        .map_err(|e| ImageProcessingError::ProcessingError(e.to_string()))
+        .map_err(|e| ImageProcessingError::Processing(e.to_string()))
     }
 }

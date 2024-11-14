@@ -12,7 +12,7 @@ fn get_face_restoration_processor() -> &'static ModelProcessor<FaceRestorationMo
     FACE_RESTORATION_PROCESSOR.get_or_init(|| {
         let model_path = Path::new("models").join("GFPGANv1.4.onnx");
 
-        ModelProcessor::<FaceRestorationModel>::new(&model_path.to_str().unwrap())
+        ModelProcessor::<FaceRestorationModel>::new(model_path.to_str().unwrap())
             .map_err(|e| e.to_string())
             .unwrap()
     })

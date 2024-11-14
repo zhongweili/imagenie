@@ -10,7 +10,7 @@ fn get_upscale_processor() -> &'static ModelProcessor<UpscalingModel> {
     UPSCALE_PROCESSOR.get_or_init(|| {
         let model_path = Path::new("models").join("RealESRGAN_x2_fp16.onnx");
 
-        ModelProcessor::<UpscalingModel>::new(&model_path.to_str().unwrap())
+        ModelProcessor::<UpscalingModel>::new(model_path.to_str().unwrap())
             .map_err(|e| e.to_string())
             .unwrap()
     })
