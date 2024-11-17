@@ -149,7 +149,20 @@ const startProcessing = async () => {
   isProcessing.value = true
   console.log(store.inputPath, store.outputDir)
   try {
-    const command = props.mode === 'upscaling' ? 'upscale_image' : 'face_restoration'
+    let command
+    switch (props.mode) {
+      case 'upscaling':
+        command = 'upscale_image'
+        break
+      case 'remove-background':
+        command = 'background_removal'
+        break
+      case 'restoration':
+        command = 'face_restoration'
+        break
+      default:
+        throw new Error(`Unsupported mode: ${props.mode}`)
+    }
     const outputPath = await invoke(command, {
       inputPath: store.inputPath,
       outputDir: store.outputDir

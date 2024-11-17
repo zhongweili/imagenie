@@ -5,7 +5,9 @@ mod utils;
 use std::error::Error;
 
 use commands::{
-    face_restoration::face_restoration, upscaling::upscale_image, upscaling::upscale_images,
+    background_removal::background_removal,
+    face_restoration::face_restoration,
+    upscaling::{upscale_image, upscale_images},
 };
 use tauri::{
     menu::{CheckMenuItem, Menu, MenuItem, SubmenuBuilder},
@@ -19,7 +21,6 @@ use utils::log_dir;
 
 pub fn app() -> anyhow::Result<Builder<Wry>> {
     let builder = tauri::Builder::default()
-        .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(logger().build())
@@ -30,7 +31,8 @@ pub fn app() -> anyhow::Result<Builder<Wry>> {
         .invoke_handler(tauri::generate_handler![
             face_restoration,
             upscale_image,
-            upscale_images
+            upscale_images,
+            background_removal
         ])
         .setup(setup)
         .on_page_load(page_load_handler)
