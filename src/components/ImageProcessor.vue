@@ -2,7 +2,7 @@
   <div class="image-processor">
     <div class="image-container">
       <!-- Upload Area -->
-      <div 
+      <div
         v-if="!processedImageUrl"
         class="upload-zone"
         @drop.prevent="handleDrop"
@@ -11,9 +11,9 @@
         @click="selectInputFile"
       >
         <div class="image-preview-wrapper" v-if="inputImage">
-          <img 
-            :src="inputImage" 
-            alt="Input image" 
+          <img
+            :src="inputImage"
+            alt="Input image"
             ref="previewImage"
             @load="handlePreviewImageLoad"
           />
@@ -29,8 +29,8 @@
           <div class="comparison-content">
             <img-comparison-slider class="comparison-slider">
               <div slot="first" class="image-wrapper">
-                <img 
-                  :src="inputImage || undefined" 
+                <img
+                  :src="inputImage || undefined"
                   alt="Original image"
                   class="comparison-image"
                   ref="originalImage"
@@ -38,8 +38,8 @@
                 />
               </div>
               <div slot="second" class="image-wrapper">
-                <img 
-                  :src="processedImageUrl" 
+                <img
+                  :src="processedImageUrl"
                   alt="Processed image"
                   class="comparison-image"
                   ref="processedImage"
@@ -51,21 +51,21 @@
         </div>
       </div>
     </div>
-    
+
     <div class="control-panel">
-      <button 
+      <button
         class="control-button"
         @click="selectInputFile"
       >
         {{ t('imageProcessor.selectInput') }}
       </button>
-      <button 
+      <button
         class="control-button"
         @click="selectOutputDir"
       >
         {{ t('imageProcessor.selectOutput') }}
       </button>
-      <button 
+      <button
         class="control-button primary"
         @click="startProcessing"
         :disabled="!canProcess || isProcessing"
@@ -73,7 +73,7 @@
         {{ isProcessing ? t('imageProcessor.processing') : t('imageProcessor.startProcess') }}
       </button>
     </div>
-    
+
     <div v-if="isProcessing" class="processing-status">
       {{ t('imageProcessor.processingStatus') }}
     </div>
@@ -106,15 +106,18 @@ const selectInputFile = async () => {
       extensions: ['png', 'jpg', 'jpeg']
     }]
   });
-  
+
   if (selected && !Array.isArray(selected)) {
     store.setInputFile(selected);
     const assetUrl = convertFileSrc(selected);
     store.setInputImage(assetUrl);
+    // set outputdir as the same directory as input file
+    const outputDir = await join(selected, '..');
+    store.setOutputDir(outputDir);
   }
 }
 
-// TODO need to switch to tauri DRAG_DROP event
+// TODO: need to switch to tauri DRAG_DROP event
 const handleDrop = async (event: DragEvent) => {
   event.preventDefault()
   const file = event.dataTransfer?.files[0]
@@ -160,6 +163,7 @@ const startProcessing = async () => {
     console.error('Processing failed:', error)
   } finally {
     isProcessing.value = false
+    store.setOutputDir(undefined)
   }
 }
 
@@ -171,7 +175,7 @@ const previewImage = ref<HTMLImageElement | null>(null)
 
 const handlePreviewImageLoad = () => {
   if (!previewImage.value) return
-  
+
   const img = previewImage.value
   const container = img.parentElement
   if (!container) return
@@ -254,6 +258,7 @@ const { t } = useI18n()
   height: 100%;
   padding: 1.5rem;
   gap: 1.5rem;
+  position: relative;
 }
 
 .image-container {
@@ -344,11 +349,11 @@ const { t } = useI18n()
   object-fit: contain;
   transition: width 0.3s ease, height 0.3s ease;
 }
-
 .control-panel {
   display: flex;
   gap: 1rem;
   padding: 0.5rem 0;
+  align-items: center; /* Added to vertically align items */
 }
 
 .control-button {
@@ -381,9 +386,16 @@ const { t } = useI18n()
 }
 
 .processing-status {
-  text-align: center;
   color: #666;
   font-size: 0.9rem;
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  margin-left: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  z-index: 10;
 }
 
 .image-preview-wrapper {
@@ -399,4 +411,4 @@ const { t } = useI18n()
   transition: width 0.3s ease, height 0.3s ease;
   object-fit: contain;
 }
-</style> 
+</style>

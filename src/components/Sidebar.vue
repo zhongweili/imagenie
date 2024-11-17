@@ -15,8 +15,8 @@
       active-text-color="#ffd04b"
       @select="handleSelect"
     >
-      <el-menu-item 
-        v-for="item in menuItems" 
+      <el-menu-item
+        v-for="item in menuItems"
         :key="item.path"
         :index="item.path"
         :route="item.path"
@@ -74,11 +74,6 @@ const menuItems = [
     icon: 'Fold',
   },
   {
-    path: '/resizing',
-    titleKey: 'sidebar.menu.resizing',
-    icon: 'Fold',
-  },
-  {
     path: '/restoration',
     titleKey: 'sidebar.menu.restoration',
     icon: 'Picture',
@@ -108,14 +103,14 @@ const handleSelect = (path: string) => {
   position: relative;
   display: flex;
   flex-direction: column;
-  
+
   &--collapsed {
     width: 64px;
-    
+
     #{$self}__logo {
       padding: 0;
       justify-content: center;
-      
+
       .collapse-icon {
         margin: 0;
       }
@@ -133,7 +128,7 @@ const handleSelect = (path: string) => {
       padding: 8px 0;
       display: flex;
       justify-content: center;
-      
+
       .lang-switch {
         width: auto;
         padding: 8px 0;
@@ -166,12 +161,12 @@ const handleSelect = (path: string) => {
   &__menu {
     flex: 1;
     border-right: none;
-    
+
     :deep(.el-menu-item) {
       &.is-active {
         background-color: #444;
       }
-      
+
       &:hover {
         background-color: #444;
       }
@@ -181,7 +176,7 @@ const handleSelect = (path: string) => {
   &__bottom {
     padding: 16px;
     border-top: 1px solid #444;
-    
+
     .lang-switch {
       width: 100%;
       background: none;
@@ -191,7 +186,7 @@ const handleSelect = (path: string) => {
       padding: 8px;
       border-radius: 4px;
       transition: background-color 0.3s;
-      
+
       &:hover {
         background-color: #444;
       }
@@ -205,7 +200,7 @@ const handleSelect = (path: string) => {
     transition: transform 0.3s;
     position: absolute;
     right: 12px;
-    
+
     &:hover {
       color: #ffd04b;
     }
@@ -228,7 +223,7 @@ const handleSelect = (path: string) => {
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 4px;
-  
+
   &:hover {
     background-color: #444;
   }

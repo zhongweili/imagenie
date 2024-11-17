@@ -11,11 +11,6 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/UpscalingView.vue')
   },
   {
-    path: '/resizing',
-    name: 'Resizing',
-    component: () => import('@/views/ResizingView.vue')
-  },
-  {
     path: '/restoration',
     name: 'Restoration',
     component: () => import('@/views/RestorationView.vue')
@@ -32,4 +27,4 @@ const router = createRouter({
   routes: routes
 })
 
-export default router 
+export default router

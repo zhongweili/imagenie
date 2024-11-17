@@ -45,8 +45,8 @@ export const useStore = defineStore('main', {
       this.inputImage = image
     },
 
-    async setOutputDir(dir: string) {
-      this.outputDir = dir
+    async setOutputDir(dir: string | undefined) {
+      this.outputDir = dir ?? null
     }
   }
 })

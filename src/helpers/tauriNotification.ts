@@ -8,8 +8,8 @@ import { i18n } from '@/i18n'
 async function checkPermission() {
 if (!(await isPermissionGranted())) {
     return (await requestPermission()) === 'granted'
-}
-return true
+    }
+    return true
 }
 
 export async function enqueueNotification(title: string, body: string) {

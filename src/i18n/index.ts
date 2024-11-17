@@ -11,7 +11,7 @@ const messages = {
       confirm: 'Confirm'
     },
     nav: {
-      removeBackground: 'Remove Background',
+      removeBackground: 'Background Removal',
       upscaling: 'Image Upscaling',
       resizing: 'Image Resizing'
     },
@@ -30,9 +30,9 @@ const messages = {
     function: {
       scale: 'Scale',
       strength: 'Strength',
-      removeBackground: 'Remove Background',
+      removeBackground: 'Background Removal',
       upscaling: 'Image Upscaling',
-      restoration: 'Image Restoration',
+      restoration: 'Face Restoration',
       resizing: 'Image Resizing'
     },
     layout: {
@@ -52,8 +52,8 @@ const messages = {
       menu: {
         upscaling: 'Image Upscaling',
         resizing: 'Image Resizing',
-        restoration: 'Image Restoration',
-        removeBackground: 'Remove Background'
+        restoration: 'Face Restoration',
+        removeBackground: 'Background Removal'
       }
     }
   },
@@ -103,14 +103,14 @@ const messages = {
       processing: '处理中...',
       processingStatus: '正在处理图片，请稍候...',
       processingCompleted: '处理完成',
-      processingCompletedDesc: '处理完成，请对比查看结果'     
+      processingCompletedDesc: '处理完成，请对比查看结果'
     },
     sidebar: {
       title: 'Imagenie',
       menu: {
         upscaling: '图像放大',
         resizing: '图像缩放',
-        restoration: '图像修复',
+        restoration: '人像修复',
         removeBackground: '背景移除'
       }
     }
@@ -122,4 +122,4 @@ export const i18n = createI18n({
   locale: 'en', // Default language
   fallbackLocale: 'en',
   messages
-}) 
+})
