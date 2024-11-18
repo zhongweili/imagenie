@@ -54,7 +54,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   }
 }
 
-const props = defineProps<{
+const { collapse } = defineProps<{
   collapse: boolean
 }>()
 

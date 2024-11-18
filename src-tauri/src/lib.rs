@@ -71,11 +71,11 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
             .content_protected(true);
     }
 
-    let webview = builder.build()?;
+    let _webview = builder.build()?;
 
     #[cfg(debug_assertions)]
     {
-        webview.open_devtools();
+        _webview.open_devtools();
     }
 
     Ok(())

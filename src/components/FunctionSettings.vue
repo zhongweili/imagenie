@@ -27,7 +27,7 @@
 
   const { t } = useI18n()
 
-  const props = defineProps<{
+  const { mode } = defineProps<{
     mode: string
   }>()
 
