@@ -1,9 +1,14 @@
 mod commands;
+mod image;
 mod utils;
 
 use std::error::Error;
 
-use commands::backend_add;
+use commands::{
+    background_removal::background_removal,
+    face_restoration::face_restoration,
+    upscaling::{upscale_image, upscale_images},
+};
 use tauri::{
     menu::{CheckMenuItem, Menu, MenuItem, SubmenuBuilder},
     tray::{MouseButton, TrayIconBuilder, TrayIconEvent},
@@ -16,16 +21,19 @@ use utils::log_dir;
 
 pub fn app() -> anyhow::Result<Builder<Wry>> {
     let builder = tauri::Builder::default()
-        .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        .plugin(tauri_plugin_http::init())
         .plugin(logger().build())
-        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_fs::init())
-        .invoke_handler(tauri::generate_handler![backend_add])
+        .invoke_handler(tauri::generate_handler![
+            face_restoration,
+            upscale_image,
+            upscale_images,
+            background_removal
+        ])
         .setup(setup)
         .on_page_load(page_load_handler)
         .on_window_event(window_event_handler);
