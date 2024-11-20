@@ -1,16 +1,61 @@
-# Tauri + Vue + TypeScript
+# 🎨 Imagenie
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Your Personal Genie for Stunning Images
 
-## Recommended IDE Setup
+Imagenie is a sleek, privacy-first desktop application that brings advanced AI image processing to your fingertips. From stunning upscaling to precise background removal, Imagenie is designed to help everyone—from hobbyists to professionals—transform their images effortlessly.
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+<p align="center"> <img src="https://via.placeholder.com/800x400?text=Demo+Image+Here" alt="Imagenie Showcase" width="800"> </p>
 
-## Type Support For `.vue` Imports in TS
+## ✨ Features at a Glance
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
+🎯 Intelligent Image Upscaling: Restore details and clarity in low-resolution images.
+💁‍♂️ Face Restoration: Fix and enhance facial features with AI-driven precision.
+🔍 Background Removal: Automatically isolate subjects with pixel-perfect accuracy.
+⚡ Real-Time Comparison: Swipe through before & after sliders to see the magic unfold.
+🌎 Multi-Language Support: Available in English and Chinese, with more on the way.
+🔒 100% Local Processing: No cloud, no risks—complete control over your image privacy.
 
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
+## 🧠 Why Imagenie?
 
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+Modern Tech Stack: Developed with the powerful Tauri 2 and Vue 3, delivering an ultra-lightweight desktop app.
+AI-Enhanced Speed: Built on ONNX Runtime 2.0.0-rc, optimized for lightning-fast processing.
+Stunning UI: Designed for an intuitive experience, Imagenie brings powerful tools in a user-friendly interface.
+
+## 🚀 Quick Start
+
+Installation
+Download the latest release for your platform: Windows, macOS, or Linux.
+Install the application by following the provided instructions.
+Launch Imagenie and start transforming your images!
+
+## 🌟 Showcase
+
+Image Upscaling
+
+<p align="center"> <img src="https://via.placeholder.com/800x400?text=Upscaling+Demo" alt="Upscaling Showcase" width="800"> </p>
+Background Removal
+<p align="center"> <img src="https://via.placeholder.com/800x400?text=Background+Removal+Demo" alt="Background Removal" width="800"> </p>
+More examples and videos available on our Website or GitHub Discussions!
+
+## 📖 Roadmap
+
+[x] Image Upscaling
+[x] Face Restoration
+[x] Background Removal
+[] Batch Processing (In Progress)
+[] Support for Additional AI Models
+Stay updated by checking our Milestones!
+
+## 🤝 Contribute
+
+Imagenie thrives on community input!
+
+🐛 Found a Bug? Open an issue here.
+💡 Have a Feature Idea? Submit your ideas here.
+👩‍💻 Want to Contribute? See our Contributing Guidelines.
+
+## 📜 License
+
+Imagenie is licensed under the MIT License, so you’re free to fork, modify, and distribute it.
+
+Craft your images with precision and privacy. Imagenie—AI magic, locally yours. ✨
