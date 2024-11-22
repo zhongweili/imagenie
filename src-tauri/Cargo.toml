@@ -45,4 +45,4 @@ num-traits = "0.2"
 tokio = "1.41.1"
 
 [package.metadata.cargo-machete]
-ignored = ["serde_json", "serde", "num-traits", "tauri-plugin-http", "tauri-plugin-shell"]
+ignored = ["serde_json", "serde", "num-traits", "tauri-plugin-http", "tauri-plugin-shell", "tokio"]

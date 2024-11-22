@@ -9,6 +9,7 @@
     "core:default",
     "dialog:default",
     "fs:default",
-    "notification:default"
+    "notification:default",
+    "fs:allow-resource-read-recursive"
   ]
 }

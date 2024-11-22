@@ -5,9 +5,11 @@ pub struct UpscalingParams {}
 
 #[derive(Clone)]
 pub struct FaceRestorationParams {
-    pub face_size: u32,
+    pub model_width: usize,
+    pub model_height: usize,
     pub original_width: Option<u32>,
     pub original_height: Option<u32>,
+    pub scaling_factor: Option<f32>,
 }
 
 #[derive(Clone, Default)]
@@ -22,9 +24,11 @@ pub struct BackgroundRemovalParams {
 impl Default for FaceRestorationParams {
     fn default() -> Self {
         Self {
-            face_size: 512,
+            model_width: 512,
+            model_height: 512,
             original_width: None,
             original_height: None,
+            scaling_factor: None,
         }
     }
 }

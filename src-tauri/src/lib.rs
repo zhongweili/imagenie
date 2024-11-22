@@ -16,7 +16,7 @@ use tauri::{
     App, AppHandle, Builder, Manager, Runtime, WebviewUrl, WebviewWindowBuilder, Wry,
 };
 use tauri_plugin_log::{Target, TargetKind};
-use tracing::{debug, info};
+use tracing::info;
 use utils::log_dir;
 
 pub fn app() -> anyhow::Result<Builder<Wry>> {
@@ -86,7 +86,7 @@ fn page_load_handler(window: &tauri::Webview, _payload: &PageLoadPayload<'_>) {
 }
 
 fn window_event_handler(window: &tauri::Window, event: &tauri::WindowEvent) {
-    debug!("Window event: {:?} on {}", event, window.label());
+    // debug!("Window event: {:?} on {}", event, window.label());
 
     if let tauri::WindowEvent::CloseRequested { api, .. } = event {
         info!("Window close requested on {}", window.label());
