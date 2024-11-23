@@ -108,6 +108,7 @@ const selectInputFile = async () => {
   });
 
   if (selected && !Array.isArray(selected)) {
+    processedImageUrl.value = ''
     store.setInputFile(selected);
     const assetUrl = convertFileSrc(selected);
     store.setInputImage(assetUrl);
@@ -343,6 +344,10 @@ const { t } = useI18n()
   --divider-width: 2px;
   --divider-color: #666;
   --handle-color: #666;
+  --default-handle-color: #666;
+  --default-handle-width: 40px;
+  --default-divider-width: 2px;
+  --default-divider-color: #666;
 }
 
 .image-wrapper {

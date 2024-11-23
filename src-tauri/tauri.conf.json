@@ -23,7 +23,12 @@
   "app": {
     "windows": [],
     "security": {
-      "csp": "default-src 'self' ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost",
+      "csp": {
+        "default-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' asset: https://asset.localhost",
+        "connect-src": "'self' ipc: tauri: asset: https://asset.localhost"
+      },
       "assetProtocol": {
         "enable": true,
         "scope": [

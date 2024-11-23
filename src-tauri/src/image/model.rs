@@ -228,31 +228,17 @@ impl ImageModel for BackgroundRemovalModel<f32> {
         params.original_width = Some(image.width());
         params.original_height = Some(image.height());
 
-        // Calculate scaling factor based on model input requirements
-        let scaling_factor = f32::min(
-            1.0,
-            f32::min(
-                params.model_width as f32 / image.width() as f32,
-                params.model_height as f32 / image.height() as f32,
-            ),
-        );
-        params.scaling_factor = Some(scaling_factor);
-
-        // Calculate target dimensions while preserving aspect ratio
-        let target_width = (image.width() as f32 * scaling_factor) as u32;
-        let target_height = (image.height() as f32 * scaling_factor) as u32;
-
-        // Resize image preserving aspect ratio
-        let resized = image.resize(
-            target_width,
-            target_height,
+        // Resize image to exact model dimensions (1024x1024)
+        let resized = image.resize_exact(
+            params.model_width as u32,
+            params.model_height as u32,
             image::imageops::FilterType::Lanczos3,
         );
 
         // Convert to tensor with normalization
         let rgb_image = resized.to_rgb8();
         let tensor = ndarray::Array::from_shape_fn(
-            (1, 3, target_height as usize, target_width as usize),
+            (1, 3, params.model_height, params.model_width),
             |(_, c, y, x)| {
                 let pixel = rgb_image.get_pixel(x as u32, y as u32);
                 (pixel[c] as f32 / 255.0 - 0.5) / 0.5
