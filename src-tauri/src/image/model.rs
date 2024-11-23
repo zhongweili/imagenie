@@ -50,7 +50,22 @@ impl ImageModel for UpscalingModel<half::f16> {
         _params: &mut Self::Params,
     ) -> Result<TensorInput<Self::InputType>, ImageProcessingError> {
         let image = image::open(image_path)?;
-        image_to_tensor(&image)
+
+        // Make sure that the image size is even
+        let width = if image.width() % 2 == 1 {
+            image.width() + 1
+        } else {
+            image.width()
+        };
+        let height = if image.height() % 2 == 1 {
+            image.height() + 1
+        } else {
+            image.height()
+        };
+
+        let resized = image.resize_exact(width, height, image::imageops::FilterType::Lanczos3);
+
+        image_to_tensor(&resized)
     }
 
     fn postprocess(

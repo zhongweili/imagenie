@@ -46,7 +46,9 @@ const messages = {
       selectOutput: 'Select Output Path',
       startProcess: 'Start Processing',
       processing: 'Processing...',
-      processingStatus: 'Processing image, please wait...'
+      processingStatus: 'Processing image, please wait...',
+      processingCompleted: 'Processing Completed',
+      processingCompletedDesc: 'Processing completed, please compare the results'
     },
     sidebar: {
       title: 'Imagenie',
