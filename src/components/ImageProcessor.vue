@@ -285,7 +285,6 @@ const { t } = useI18n()
 .upload-zone {
   width: 100%;
   height: 100%;
-  border: 2px dashed #ccc;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -10,6 +10,13 @@
     "dialog:default",
     "fs:default",
     "notification:default",
-    "fs:allow-resource-read-recursive"
+    "fs:allow-resource-read-recursive",
+    {
+      "identifier": "shell:allow-open",
+      "allow": [
+        "https://github.com/zhongweili/imagenie/issues/new",
+        "https://github.com/zhongweili/imagenie/blob/main/LICENSE"
+      ]
+    }
   ]
 }

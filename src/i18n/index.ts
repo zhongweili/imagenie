@@ -40,7 +40,8 @@ const messages = {
       header: 'Header'
     },
     imageProcessor: {
-      dropHint: 'Drag image here or click to select',
+      // dropHint: 'Drag image here or click to select',
+      dropHint: 'Click to select',
       selectInput: 'Select Input Image',
       selectOutput: 'Select Output Path',
       startProcess: 'Start Processing',
@@ -96,7 +97,8 @@ const messages = {
       header: '顶部栏'
     },
     imageProcessor: {
-      dropHint: '拖拽图片到这里或点击选择',
+      // dropHint: '拖拽图片到这里或点击选择',
+      dropHint: '点击选择',
       selectInput: '选择输入图片',
       selectOutput: '选择输出路径',
       startProcess: '开始处理',

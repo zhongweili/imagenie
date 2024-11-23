@@ -10,12 +10,14 @@ use commands::{
     upscaling::{upscale_image, upscale_images},
 };
 use tauri::{
-    menu::{CheckMenuItem, Menu, MenuItem, SubmenuBuilder},
+    menu::{Menu, MenuItem, SubmenuBuilder},
     tray::{MouseButton, TrayIconBuilder, TrayIconEvent},
     webview::PageLoadPayload,
     App, AppHandle, Builder, Manager, Runtime, WebviewUrl, WebviewWindowBuilder, Wry,
 };
+use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 use tauri_plugin_log::{Target, TargetKind};
+use tauri_plugin_shell::ShellExt;
 use tracing::info;
 use utils::log_dir;
 
@@ -28,6 +30,7 @@ pub fn app() -> anyhow::Result<Builder<Wry>> {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             face_restoration,
             upscale_image,
@@ -115,54 +118,47 @@ fn setup_menu<R: Runtime>(app: &mut App<R>) -> Result<(), Box<dyn Error>> {
     let file_menu = SubmenuBuilder::with_id(app, "file", "File")
         .item(&MenuItem::with_id(
             app,
+            "about",
+            "About",
+            true,
+            None::<&str>,
+        )?)
+        .separator()
+        .item(&MenuItem::with_id(
+            app,
             "open",
             "Open",
             true,
             Some("CmdOrCtrl+O"),
         )?)
-        .item(&MenuItem::with_id(
-            app,
-            "save",
-            "Save",
-            true,
-            Some("CmdOrCtrl+S"),
-        )?)
-        .item(&MenuItem::with_id(
-            app,
-            "saveas",
-            "Save As",
-            true,
-            Some("CmdOrCtrl+Shift+S"),
-        )?)
         .separator()
         .quit()
         .build()?;
-    let edit_menu = SubmenuBuilder::with_id(app, "edit", "Edit")
+
+    let help_menu = SubmenuBuilder::with_id(app, "help", "Help")
         .item(&MenuItem::with_id(
             app,
-            "process",
-            "Process",
-            true,
-            Some("CmdOrCtrl+P"),
-        )?)
-        .separator()
-        .undo()
-        .redo()
-        .separator()
-        .cut()
-        .copy()
-        .paste()
-        .separator()
-        .select_all()
-        .item(&CheckMenuItem::with_id(
-            app,
-            "checkme",
-            "Check Me",
-            true,
+            "report-issues",
+            "Report Issues",
             true,
             None::<&str>,
         )?)
+        .item(&MenuItem::with_id(
+            app,
+            "view-license",
+            "View License",
+            true,
+            None::<&str>,
+        )?)
+        .item(&MenuItem::with_id(
+            app,
+            "toggle-devtools",
+            "Toggle Developer Tools",
+            true,
+            Some("CmdOrCtrl+Shift+I"),
+        )?)
         .build()?;
+
     let tray_menu = SubmenuBuilder::with_id(app, "tray", "Tray")
         .item(&MenuItem::with_id(app, "open", "Open", true, None::<&str>)?)
         .item(&MenuItem::with_id(app, "hide", "Hide", true, None::<&str>)?)
@@ -187,18 +183,36 @@ fn setup_menu<R: Runtime>(app: &mut App<R>) -> Result<(), Box<dyn Error>> {
         })
         .build(app)?;
 
-    let menu = Menu::with_items(app, &[&file_menu, &edit_menu])?;
+    let menu = Menu::with_items(app, &[&file_menu, &help_menu])?;
     app.set_menu(menu)?;
     app.on_menu_event(|app, event| {
         info!("menu event: {:?}", event);
         match event.id.as_ref() {
             "open" => open_main(app).unwrap(),
-            "save" => {}
-            "saveas" => {}
-            "process" => {}
-            "checkme" => {
-                // toggle checkme status and update config and runtime state
-                // for runtime state - Arc<Mutex<State>> / ArcSwap
+            "about" => {
+                app.dialog()
+                    .message(format!(
+                        "Imagenie v{}\n\nAn AI-powered image processing tool.\n\nBuilt with Rust and Tauri.",
+                        env!("CARGO_PKG_VERSION")
+                    ))
+                    .kind(MessageDialogKind::Info)
+                    .title("About Imagenie")
+                    .show(|_| {})
+            }
+            "report-issues" => {
+                app.shell()
+                    .open("https://github.com/zhongweili/imagenie/issues/new", None)
+                    .unwrap();
+            }
+            "view-license" => {
+                app.shell()
+                    .open("https://github.com/zhongweili/imagenie/blob/main/LICENSE", None)
+                    .unwrap();
+            }
+            "toggle-devtools" => {
+                if let Some(window) = app.get_webview_window("main") {
+                    window.open_devtools();
+                }
             }
             _ => {}
         }
