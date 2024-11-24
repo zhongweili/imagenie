@@ -4,7 +4,7 @@ Your Personal Genie for Stunning Images
 
 Imagenie is a sleek, privacy-first desktop application that brings advanced AI image processing to your fingertips. From stunning upscaling to precise background removal, Imagenie is designed to help everyone—from hobbyists to professionals—transform their images effortlessly.
 
-<p align="center"> <img src="https://via.placeholder.com/800x400?text=Demo+Image+Here" alt="Imagenie Showcase" width="800"> </p>
+<p align="center"> <img src="https://imagenie.us/static-image/2024/11/a941ad8b1c2aa711fd0a6ee09a69220d.gif" alt="Imagenie Showcase" width="800"> </p>
 
 ## ✨ Features at a Glance
 
@@ -18,13 +18,13 @@ Imagenie is a sleek, privacy-first desktop application that brings advanced AI i
 ## 🧠 Why Imagenie?
 
 Modern Tech Stack: Developed with the powerful Tauri 2 and Vue 3, delivering an ultra-lightweight desktop app.
-AI-Enhanced Speed: Built on ONNX Runtime 2.0.0-rc, optimized for lightning-fast processing.
+AI-Enhanced Speed: Built on ONNX Runtime, optimized for lightning-fast processing.
 Stunning UI: Designed for an intuitive experience, Imagenie brings powerful tools in a user-friendly interface.
 
 ## 🚀 Quick Start
 
 Installation
-Download the latest release for your platform: Windows, macOS, or Linux.
+Download the latest release for your platform: Windows, macOS, or Linux. (Only macOS arm64 is available now)
 Install the application by following the provided instructions.
 Launch Imagenie and start transforming your images!
 
@@ -32,27 +32,34 @@ Launch Imagenie and start transforming your images!
 
 Image Upscaling
 
-<p align="center"> <img src="https://via.placeholder.com/800x400?text=Upscaling+Demo" alt="Upscaling Showcase" width="800"> </p>
+<p align="center"> <img src="https://imagenie.us/static-image/2024/11/d0ff2b3a53e33dd92a36750e0bf0c23a.gif" alt="Upscaling Showcase" width="800"> </p>
 Background Removal
-<p align="center"> <img src="https://via.placeholder.com/800x400?text=Background+Removal+Demo" alt="Background Removal" width="800"> </p>
+<p align="center"> <img src="https://imagenie.us/static-image/2024/11/51f37c5693dfd22313c4ed582f1bf2b4.gif" alt="Background Removal" width="800"> </p>
 More examples and videos available on our Website or GitHub Discussions!
 
 ## 📖 Roadmap
 
 [x] Image Upscaling
+
 [x] Face Restoration
+
 [x] Background Removal
-[] Batch Processing (In Progress)
-[] Support for Additional AI Models
+
+[ ] Support Windows, macOS x86_64
+
+[ ] Batch Processing
+
+[ ] Support for Additional AI Models
+
 Stay updated by checking our Milestones!
 
 ## 🤝 Contribute
 
 Imagenie thrives on community input!
 
-🐛 Found a Bug? Open an issue here.
-💡 Have a Feature Idea? Submit your ideas here.
-👩‍💻 Want to Contribute? See our Contributing Guidelines.
+🐛 Found a Bug? Open an issue.
+💡 Have a Feature Idea? Submit your ideas.
+👩‍💻 Want to Contribute? You are welcome!
 
 ## 📜 License
 
