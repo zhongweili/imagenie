@@ -1,6 +1,6 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
-  "identifier": "default",
+  "identifier": "main-capability",
   "description": "Capability for the main window",
   "windows": [
     "main"
@@ -10,12 +10,22 @@
     "dialog:default",
     "fs:default",
     "notification:default",
-    "fs:allow-resource-read-recursive",
     {
       "identifier": "shell:allow-open",
       "allow": [
         "https://github.com/zhongweili/imagenie/issues/new",
         "https://github.com/zhongweili/imagenie/blob/main/LICENSE"
+      ]
+    },
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        {
+          "path": "$APPDATA"
+        },
+        {
+          "path": "$APPDATA/**"
+        }
       ]
     }
   ]

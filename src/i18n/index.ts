@@ -50,6 +50,10 @@ const messages = {
       processingCompleted: 'Processing Completed',
       processingCompletedDesc: 'Processing completed, please compare the results'
     },
+    initialization: {
+      title: 'Initialization for the first time',
+      downloading: 'Downloading the necessary model files'
+    },
     sidebar: {
       title: 'Imagenie',
       menu: {
