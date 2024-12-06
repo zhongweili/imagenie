@@ -1,7 +1,7 @@
+use crate::utils::models_dir;
 use image::DynamicImage;
 use std::path::Path;
 use std::sync::OnceLock;
-use tauri::{path::BaseDirectory, AppHandle, Manager};
 use tracing::info;
 
 use crate::image::{
@@ -11,30 +11,28 @@ use crate::image::{
 static BACKGROUND_REMOVAL_PROCESSOR: OnceLock<ModelProcessor<BackgroundRemovalModel>> =
     OnceLock::new();
 
-fn get_background_removal_processor(
-    app: &AppHandle,
-) -> &'static ModelProcessor<BackgroundRemovalModel> {
+#[tauri::command]
+pub async fn init_background_removal() -> Result<(), String> {
+    let models_dir = models_dir();
     BACKGROUND_REMOVAL_PROCESSOR.get_or_init(|| {
-        let model_path = app
-            .path()
-            .resolve("models/background_removal.onnx", BaseDirectory::Resource)
-            .expect("Failed to resolve resource path");
+        let model_path = models_dir.join("background_removal.onnx");
 
         ModelProcessor::<BackgroundRemovalModel>::new(model_path.to_str().unwrap())
             .map_err(|e| e.to_string())
             .unwrap()
-    })
+    });
+    Ok(())
+}
+
+fn get_background_removal_processor() -> &'static ModelProcessor<BackgroundRemovalModel> {
+    BACKGROUND_REMOVAL_PROCESSOR.get().unwrap()
 }
 
 #[tauri::command]
-pub async fn background_removal(
-    app: AppHandle,
-    input_path: &str,
-    output_dir: &str,
-) -> Result<String, String> {
+pub async fn background_removal(input_path: &str, output_dir: &str) -> Result<String, String> {
     info!("background_removal was called with path: {}", input_path);
 
-    let processor = get_background_removal_processor(&app);
+    let processor = get_background_removal_processor();
     let params = BackgroundRemovalParams {
         model_width: 1024,
         model_height: 1024,

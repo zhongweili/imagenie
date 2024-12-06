@@ -24,6 +24,9 @@
         },
         {
           "url": "https://objects.githubusercontent.com/*"
+        },
+        {
+          "url": "https://api.github.com/*"
         }
       ]
     },

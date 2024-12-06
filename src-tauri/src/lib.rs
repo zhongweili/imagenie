@@ -5,9 +5,10 @@ mod utils;
 use std::error::Error;
 
 use commands::{
-    background_removal::background_removal,
-    face_restoration::face_restoration,
-    upscaling::{upscale_image, upscale_images},
+    background_removal::{background_removal, init_background_removal},
+    download::{check_model_exists, download_models},
+    face_restoration::{face_restoration, init_face_restoration},
+    upscaling::{init_upscaling, upscale_image, upscale_images},
 };
 use tauri::{
     menu::{Menu, MenuItem, SubmenuBuilder},
@@ -36,7 +37,12 @@ pub fn app() -> anyhow::Result<Builder<Wry>> {
             face_restoration,
             upscale_image,
             upscale_images,
-            background_removal
+            background_removal,
+            check_model_exists,
+            download_models,
+            init_background_removal,
+            init_face_restoration,
+            init_upscaling,
         ])
         .setup(setup)
         .on_page_load(page_load_handler)
