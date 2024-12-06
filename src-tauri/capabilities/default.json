@@ -8,7 +8,6 @@
   "permissions": [
     "core:default",
     "dialog:default",
-    "fs:default",
     "notification:default",
     {
       "identifier": "shell:allow-open",
@@ -18,15 +17,38 @@
       ]
     },
     {
+      "identifier": "http:default",
+      "allow": [
+        {
+          "url": "https://github.com/*"
+        },
+        {
+          "url": "https://objects.githubusercontent.com/*"
+        }
+      ]
+    },
+    {
       "identifier": "fs:scope",
       "allow": [
         {
-          "path": "$APPDATA"
+          "path": "$APPDATA/**/*"
         },
         {
-          "path": "$APPDATA/**"
+          "path": "$APPLOCALDATA/**/*"
+        },
+        {
+          "path": "$APPCACHE/**/*"
         }
       ]
-    }
+    },
+    "fs:default",
+    "fs:allow-app-write",
+    "fs:allow-app-write-recursive",
+    "fs:allow-appdata-write",
+    "fs:allow-appdata-write-recursive",
+    "fs:allow-appcache-write",
+    "fs:allow-appcache-write-recursive",
+    "fs:allow-appconfig-write",
+    "fs:allow-appconfig-write-recursive"
   ]
 }

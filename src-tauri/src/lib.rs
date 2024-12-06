@@ -23,6 +23,7 @@ use utils::log_dir;
 
 pub fn app() -> anyhow::Result<Builder<Wry>> {
     let builder = tauri::Builder::default()
+        .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(logger().build())
