@@ -1,7 +1,7 @@
 import { GITHUB_REPO, ModelRelease } from '../config/models';
 
 export async function getLatestModelRelease(modelName: string): Promise<ModelRelease> {
-  const apiUrl = `https://api.github.com/repos/${GITHUB_REPO.owner}/${GITHUB_REPO.repo}/releases/latest`;
+  const apiUrl = `https://api.github.com/repos/${GITHUB_REPO.owner}/${GITHUB_REPO.repo}/releases/tags/models-v0.1.0`;
 
   try {
     const response = await fetch(apiUrl);

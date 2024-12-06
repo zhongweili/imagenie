@@ -20,13 +20,19 @@
       "identifier": "http:default",
       "allow": [
         {
-          "url": "https://github.com/*"
+          "url": "https://github.com/*",
+          "headers": {
+            "Content-Security-Policy": "connect-src 'self' https://api.github.com"
+          }
         },
         {
           "url": "https://objects.githubusercontent.com/*"
         },
         {
-          "url": "https://api.github.com/*"
+          "url": "https://api.github.com/*",
+          "headers": {
+            "Content-Security-Policy": "connect-src 'self' https://api.github.com"
+          }
         }
       ]
     },
