@@ -8,6 +8,7 @@ use commands::{
     background_removal::{background_removal, init_background_removal},
     download::{check_model_exists, download_models},
     face_restoration::{face_restoration, init_face_restoration},
+    image::check_image_dimensions,
     upscaling::{init_upscaling, upscale_image, upscale_images},
 };
 use tauri::{
@@ -39,6 +40,7 @@ pub fn app() -> anyhow::Result<Builder<Wry>> {
             upscale_images,
             background_removal,
             check_model_exists,
+            check_image_dimensions,
             download_models,
             init_background_removal,
             init_face_restoration,

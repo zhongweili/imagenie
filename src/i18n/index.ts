@@ -48,7 +48,9 @@ const messages = {
       processing: 'Processing...',
       processingStatus: 'Processing image, please wait...',
       processingCompleted: 'Processing Completed',
-      processingCompletedDesc: 'Processing completed, please compare the results'
+      processingCompletedDesc: 'Processing completed, please compare the results',
+      dimensionError: 'Image dimension error',
+      dimensionErrorDesc: 'The image dimension is too large, please resize it to {maxDimension}px or less'
     },
     initialization: {
       title: 'Initialization for the first time',
@@ -111,7 +113,9 @@ const messages = {
       processing: '处理中...',
       processingStatus: '正在处理图片，请稍候...',
       processingCompleted: '处理完成',
-      processingCompletedDesc: '处理完成，请对比查看结果'
+      processingCompletedDesc: '处理完成，请对比查看结果',
+      dimensionError: '图片尺寸错误',
+      dimensionErrorDesc: '图片尺寸过大，请将图片缩放到{maxDimension}px或以下'
     },
     sidebar: {
       title: 'Imagenie',

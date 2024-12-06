@@ -150,6 +150,20 @@ const startProcessing = async () => {
   isProcessing.value = true
   console.log(store.inputPath, store.outputDir)
   try {
+    const dimensions = await invoke('check_image_dimensions', {
+      inputPath: store.inputPath
+    }) as [number, number]
+
+    console.log(dimensions)
+    const maxDimension = 2048
+    if (dimensions[0] > maxDimension || dimensions[1] > maxDimension) {
+      enqueueNotification(
+        t('imageProcessor.dimensionError'),
+        t('imageProcessor.dimensionErrorDesc', { maxDimension }),
+      )
+      return
+    }
+
     let command
     switch (props.mode) {
       case 'upscaling':
@@ -175,6 +189,10 @@ const startProcessing = async () => {
     )
   } catch (error) {
     console.error('Processing failed:', error)
+    enqueueNotification(
+      t('imageProcessor.processingError'),
+      String(error),
+    )
   } finally {
     isProcessing.value = false
     store.setOutputDir(undefined)
