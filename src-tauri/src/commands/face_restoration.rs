@@ -1,38 +1,36 @@
 use std::path::Path;
 use std::sync::OnceLock;
-use tauri::{path::BaseDirectory, AppHandle, Manager};
 use tracing::info;
 
-use crate::image::{
-    model::FaceRestorationModel, processor::ModelProcessor, types::FaceRestorationParams,
+use crate::{
+    image::{model::FaceRestorationModel, processor::ModelProcessor, types::FaceRestorationParams},
+    utils::models_dir,
 };
 
 static FACE_RESTORATION_PROCESSOR: OnceLock<ModelProcessor<FaceRestorationModel>> = OnceLock::new();
 
-fn get_face_restoration_processor(
-    app: &AppHandle,
-) -> &'static ModelProcessor<FaceRestorationModel> {
+#[tauri::command]
+pub async fn init_face_restoration() -> Result<(), String> {
+    let models_dir = models_dir();
     FACE_RESTORATION_PROCESSOR.get_or_init(|| {
-        let model_path = app
-            .path()
-            .resolve("models/GFPGANv1.4.onnx", BaseDirectory::Resource)
-            .expect("Failed to resolve resource path");
+        let model_path = models_dir.join("face_restoration.onnx");
 
         ModelProcessor::<FaceRestorationModel>::new(model_path.to_str().unwrap())
             .map_err(|e| e.to_string())
             .unwrap()
-    })
+    });
+    Ok(())
+}
+
+fn get_face_restoration_processor() -> &'static ModelProcessor<FaceRestorationModel> {
+    FACE_RESTORATION_PROCESSOR.get().unwrap()
 }
 
 #[tauri::command]
-pub async fn face_restoration(
-    app: AppHandle,
-    input_path: &str,
-    output_dir: &str,
-) -> Result<String, String> {
+pub async fn face_restoration(input_path: &str, output_dir: &str) -> Result<String, String> {
     info!("face_restoration was called with path: {}", input_path);
 
-    let processor = get_face_restoration_processor(&app);
+    let processor = get_face_restoration_processor();
     let params = FaceRestorationParams {
         model_width: 512,
         model_height: 512,

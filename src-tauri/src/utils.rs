@@ -5,6 +5,7 @@ const LOG_DIR: &str = "logs";
 const CACHE_DIR: &str = "cache";
 const DB_DIR: &str = "db";
 const CONFIG_DIR: &str = "config";
+const MODELS_DIR: &str = "models";
 
 #[inline]
 pub(crate) fn app_dir() -> PathBuf {
@@ -34,4 +35,9 @@ pub(crate) fn db_dir() -> PathBuf {
 #[inline]
 pub(crate) fn config_dir() -> PathBuf {
     app_dir().join(CONFIG_DIR)
+}
+
+#[inline]
+pub(crate) fn models_dir() -> PathBuf {
+    app_dir().join(MODELS_DIR)
 }

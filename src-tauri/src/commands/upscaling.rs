@@ -1,37 +1,34 @@
 use std::path::Path;
 use std::sync::OnceLock;
-use tauri::path::BaseDirectory;
-use tauri::{AppHandle, Manager};
 use tracing::info;
 
 use crate::image::{model::UpscalingModel, processor::ModelProcessor, types::UpscalingParams};
+use crate::utils::models_dir;
 
 static UPSCALE_PROCESSOR: OnceLock<ModelProcessor<UpscalingModel>> = OnceLock::new();
 
-fn get_upscale_processor(app: &AppHandle) -> &'static ModelProcessor<UpscalingModel> {
+#[tauri::command]
+pub async fn init_upscaling() -> Result<(), String> {
+    let models_dir = models_dir();
     UPSCALE_PROCESSOR.get_or_init(|| {
-        let model_path = app
-            .path()
-            .resolve("models/RealESRGAN_x2_fp16.onnx", BaseDirectory::Resource)
-            .expect("Failed to resolve resource path");
-
-        info!("Loading model from path: {:?}", model_path);
+        let model_path = models_dir.join("image_upscaling.onnx");
 
         ModelProcessor::<UpscalingModel>::new(model_path.to_str().unwrap())
             .map_err(|e| e.to_string())
             .unwrap()
-    })
+    });
+    Ok(())
+}
+
+fn get_upscale_processor() -> &'static ModelProcessor<UpscalingModel> {
+    UPSCALE_PROCESSOR.get().unwrap()
 }
 
 #[tauri::command]
-pub async fn upscale_image(
-    app: AppHandle,
-    input_path: &str,
-    output_dir: &str,
-) -> Result<String, String> {
+pub async fn upscale_image(input_path: &str, output_dir: &str) -> Result<String, String> {
     info!("upscale_image was called with path: {}", input_path);
 
-    let processor = get_upscale_processor(&app);
+    let processor = get_upscale_processor();
     let params = UpscalingParams {};
 
     let image = processor
@@ -55,17 +52,13 @@ pub async fn upscale_image(
 }
 
 #[tauri::command]
-pub async fn upscale_images(
-    app: AppHandle,
-    input_paths: Vec<String>,
-    output_dir: &str,
-) -> Result<(), String> {
+pub async fn upscale_images(input_paths: Vec<String>, output_dir: &str) -> Result<(), String> {
     info!(
         "upscale_images was called with {} images",
         input_paths.len()
     );
 
-    let processor = get_upscale_processor(&app);
+    let processor = get_upscale_processor();
     let params = UpscalingParams {};
 
     let paths_clone = input_paths.clone();

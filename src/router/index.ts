@@ -3,12 +3,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: '/upscaling'
-  },
-  {
-    path: '/upscaling',
-    name: 'Upscaling',
-    component: () => import('@/views/UpscalingView.vue')
+    redirect: '/restoration'
   },
   {
     path: '/restoration',
@@ -19,7 +14,12 @@ const routes: RouteRecordRaw[] = [
     path: '/remove-background',
     name: 'RemoveBackground',
     component: () => import('@/views/RemoveBackgroundView.vue')
-  }
+  },
+  {
+    path: '/upscaling',
+    name: 'Upscaling',
+    component: () => import('@/views/UpscalingView.vue')
+  },
 ]
 
 const router = createRouter({

@@ -1,6 +1,6 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
-  "identifier": "default",
+  "identifier": "main-capability",
   "description": "Capability for the main window",
   "windows": [
     "main"
@@ -8,15 +8,56 @@
   "permissions": [
     "core:default",
     "dialog:default",
-    "fs:default",
     "notification:default",
-    "fs:allow-resource-read-recursive",
     {
       "identifier": "shell:allow-open",
       "allow": [
         "https://github.com/zhongweili/imagenie/issues/new",
         "https://github.com/zhongweili/imagenie/blob/main/LICENSE"
       ]
-    }
+    },
+    {
+      "identifier": "http:default",
+      "allow": [
+        {
+          "url": "https://github.com/*",
+          "headers": {
+            "Content-Security-Policy": "connect-src 'self' https://api.github.com"
+          }
+        },
+        {
+          "url": "https://objects.githubusercontent.com/*"
+        },
+        {
+          "url": "https://api.github.com/*",
+          "headers": {
+            "Content-Security-Policy": "connect-src 'self' https://api.github.com"
+          }
+        }
+      ]
+    },
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        {
+          "path": "$APPDATA/**/*"
+        },
+        {
+          "path": "$APPLOCALDATA/**/*"
+        },
+        {
+          "path": "$APPCACHE/**/*"
+        }
+      ]
+    },
+    "fs:default",
+    "fs:allow-app-write",
+    "fs:allow-app-write-recursive",
+    "fs:allow-appdata-write",
+    "fs:allow-appdata-write-recursive",
+    "fs:allow-appcache-write",
+    "fs:allow-appcache-write-recursive",
+    "fs:allow-appconfig-write",
+    "fs:allow-appconfig-write-recursive"
   ]
 }
