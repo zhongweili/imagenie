@@ -26,8 +26,9 @@
       "csp": {
         "default-src": "'self'",
         "style-src": "'self' 'unsafe-inline'",
-        "img-src": "'self' asset: https://asset.localhost",
-        "connect-src": "'self' ipc: tauri: asset: https://asset.localhost"
+        "img-src": "'self' asset: https://raw.githubusercontent.com data:",
+        "connect-src": "'self' ipc: https://api.github.com",
+        "script-src": "'self'"
       },
       "assetProtocol": {
         "enable": true,
