@@ -11,7 +11,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      changelog: ${{ steps.git-cliff.outputs.content }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate a changelog
+        uses: orhun/git-cliff-action@v2
+        id: git-cliff
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          config: cliff.toml
+          args: -vv --latest --strip header
+        env:
+          OUTPUT: CHANGES.md
+
   publish-tauri:
+    needs: create-release
     permissions:
       contents: write
     strategy:
@@ -50,23 +70,13 @@ jobs:
       - name: install frontend dependencies
         run: yarn install
 
-      - name: Generate a changelog
-        uses: orhun/git-cliff-action@v2
-        id: git-cliff
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          config: cliff.toml
-          args: -vv --latest --strip header
-        env:
-          OUTPUT: CHANGES.md
-
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: app-v__VERSION__
           releaseName: 'App v__VERSION__'
-          releaseBody: ${{ steps.git-cliff.outputs.content }}
+          releaseBody: ${{ needs.create-release.outputs.changelog }}
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
