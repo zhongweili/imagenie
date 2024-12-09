@@ -28,7 +28,7 @@
 
     <div class="sidebar__bottom">
       <button @click="toggleLanguage" class="lang-switch">
-        {{ locale === 'en' ? '中文' : 'English' }}
+        <Icon icon="solar:global-linear" width="18" height="18" />
       </button>
     </div>
   </div>
@@ -39,6 +39,7 @@ import { computed, getCurrentInstance } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
+import { Icon } from '@iconify/vue'
 import { useStore } from '@/store/index.ts'
 
 const { t } = useI18n()
@@ -69,11 +70,6 @@ const activeRoute = computed(() => route.path);
 
 const menuItems = [
   {
-    path: '/upscaling',
-    titleKey: 'sidebar.menu.upscaling',
-    icon: 'Fold',
-  },
-  {
     path: '/restoration',
     titleKey: 'sidebar.menu.restoration',
     icon: 'Picture',
@@ -83,6 +79,11 @@ const menuItems = [
     titleKey: 'sidebar.menu.removeBackground',
     icon: 'Scissor',
   },
+  {
+    path: '/upscaling',
+    titleKey: 'sidebar.menu.upscaling',
+    icon: 'Fold',
+  }
 ];
 
 const handleSelect = (path: string) => {
@@ -186,6 +187,9 @@ const handleSelect = (path: string) => {
       padding: 8px;
       border-radius: 4px;
       transition: background-color 0.3s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
       &:hover {
         background-color: #444;
