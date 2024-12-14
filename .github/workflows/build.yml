@@ -108,6 +108,7 @@ jobs:
     name: Release
     needs: [build-for-macos, build-for-windows]
     runs-on: ubuntu-latest
+    permissions: write-all
 
     steps:
       - uses: actions/checkout@v4
