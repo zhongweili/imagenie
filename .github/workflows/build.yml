@@ -96,7 +96,8 @@ jobs:
           yarn install
           $VERSION = node -p "require('./package.json').version"
           $env:TAURI_BUNDLE_NSI = "true"
-          yarn tauri build -c '{\"version\":\"'$VERSION'\"}' -t ${{ matrix.target }} --bundles nsis
+          $CONFIG = @{version=$VERSION} | ConvertTo-Json -Compress
+          yarn tauri build --config $CONFIG -t ${{ matrix.target }} --bundles nsis
           if ($LASTEXITCODE -ne 0) {
             throw "Tauri build failed with exit code $LASTEXITCODE"
           }
