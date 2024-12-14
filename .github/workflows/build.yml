@@ -27,16 +27,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8.5.1
-      - name: Setup Node.js
+      - name: Setup Yarn
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
-          cache-dependency-path: "pnpm-lock.yaml"
+          cache: "yarn"
+          cache-dependency-path: "yarn.lock"
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -48,9 +44,9 @@ jobs:
           workspaces: './src-tauri -> target'
       - name: Build APP
         run: |
-          pnpm install
+          yarn install
           VERSION=$(node -p "require('./package.json').version")
-          CI=false pnpm tauri build -c "{\"version\":\"$VERSION\"}" -t ${{ matrix.target }}
+          CI=false yarn tauri build -c "{\"version\":\"$VERSION\"}" -t ${{ matrix.target }}
           APP_NAME="Imagenie_${VERSION}_${{ matrix.build }}_${{ matrix.arch }}"
           node scripts/dist.js ${{ matrix.target }} $APP_NAME
       - name: Upload App
@@ -79,16 +75,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8.5.1
-      - name: Setup Node.js
+      - name: Setup Yarn
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
-          cache-dependency-path: "pnpm-lock.yaml"
+          cache: "yarn"
+          cache-dependency-path: "yarn.lock"
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -101,9 +93,9 @@ jobs:
       - name: Build APP
         shell: pwsh
         run: |
-          pnpm install
+          yarn install
           $VERSION = node -p "require('./package.json').version"
-          pnpm tauri build -c "{\`"version\`":\`"$VERSION\`"}" -t ${{ matrix.target }} --bundles nsis
+          yarn tauri build -c "{\`"version\`":\`"$VERSION\`"}" -t ${{ matrix.target }} --bundles nsis
           $APP_NAME = "Imagenie_${VERSION}_${{ matrix.build }}_${{ matrix.arch }}"
           node scripts/dist.js ${{ matrix.target }} $APP_NAME
       - name: Upload App
