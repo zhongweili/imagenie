@@ -59,7 +59,11 @@
         "installMode": "perMachine",
         "headerImage": null,
         "sidebarImage": null,
-        "installerIcon": "icons/icon.ico"
+        "installerIcon": "icons/icon.ico",
+        "languages": [
+          "English",
+          "SimpChinese"
+        ]
       }
     }
   }
