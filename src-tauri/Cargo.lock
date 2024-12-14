@@ -2291,10 +2291,9 @@ dependencies = [
  "futures-util",
  "half",
  "image",
- "ndarray 0.16.1",
+ "ndarray",
  "num-traits",
- "ort 1.16.3",
- "ort 2.0.0-rc.8",
+ "ort",
  "rayon",
  "reqwest",
  "serde",
@@ -2815,19 +2814,6 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "tempfile",
-]
-
-[[package]]
-name = "ndarray"
-version = "0.15.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "adb12d4e967ec485a5f71c6311fe28158e9d6f4bc4a447b474184d0f91a8fa32"
-dependencies = [
- "matrixmultiply",
- "num-complex",
- "num-integer",
- "num-traits",
- "rawpointer",
 ]
 
 [[package]]
@@ -3360,31 +3346,12 @@ dependencies = [
 
 [[package]]
 name = "ort"
-version = "1.16.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "889dca4c98efa21b1ba54ddb2bde44fd4920d910f492b618351f839d8428d79d"
-dependencies = [
- "flate2",
- "lazy_static",
- "libc",
- "ndarray 0.15.6",
- "tar",
- "thiserror 1.0.69",
- "tracing",
- "ureq",
- "vswhom",
- "winapi",
- "zip",
-]
-
-[[package]]
-name = "ort"
 version = "2.0.0-rc.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "11826e6118cc42fea0cb2b102f7d006c1bb339cb167f8badb5fb568616438234"
 dependencies = [
  "half",
- "ndarray 0.16.1",
+ "ndarray",
  "ort-sys",
  "tracing",
 ]
@@ -7057,18 +7024,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.87",
-]
-
-[[package]]
-name = "zip"
-version = "0.6.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "760394e246e4c28189f19d488c058bf16f564016aefac5d32bb1f3b51d5e9261"
-dependencies = [
- "byteorder",
- "crc32fast",
- "crossbeam-utils",
- "flate2",
 ]
 
 [[package]]

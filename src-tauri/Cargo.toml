@@ -50,20 +50,3 @@ chrono = "0.4.38"
 
 [package.metadata.cargo-machete]
 ignored = ["serde_json", "serde", "num-traits", "tauri-plugin-http", "tauri-plugin-shell", "tokio"]
-
-[target.'cfg(target_os = "windows")'.dependencies]
-ort = { version = "1.16.3", features = [
-    "download-binaries",
-    "cuda",
-], default-features = false }
-
-[target.'cfg(all(target_os = "windows", target_arch = "x86_64"))'.dependencies]
-ort = { version = "1.16.3", features = [
-    "download-binaries",
-    "cuda",
-], default-features = false }
-
-[target.'cfg(all(target_os = "windows", target_arch = "aarch64"))'.dependencies]
-ort = { version = "1.16.3", features = [
-    "download-binaries",
-], default-features = false }
