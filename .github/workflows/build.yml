@@ -1,0 +1,149 @@
+name: Build APP
+on:
+  workflow_dispatch:
+
+jobs:
+  build-for-macos:
+    name: macOS
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: universal-apple-darwin
+            build: macos
+            os: macos-latest
+            arch: universal
+          - target: aarch64-apple-darwin
+            build: macos
+            os: macos-latest
+            arch: aarch64
+          - target: x86_64-apple-darwin
+            build: macos
+            os: macos-latest
+            arch: x86_64
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8.5.1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.arch == 'universal' && 'aarch64-apple-darwin,x86_64-apple-darwin' || matrix.target }}
+      - name: Setup Rust Cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+      - name: Build APP
+        run: |
+          pnpm install
+          VERSION=$(node -p "require('./package.json').version")
+          CI=false pnpm tauri build -c "{\"version\":\"$VERSION\"}" -t ${{ matrix.target }}
+          APP_NAME="Imagenie_${VERSION}_${{ matrix.build }}_${{ matrix.arch }}"
+          node scripts/dist.js ${{ matrix.target }} $APP_NAME
+      - name: Upload App
+        uses: actions/upload-artifact@v4
+        with:
+          name: app_${{ matrix.build }}_${{ matrix.arch }}
+          path: dist/Imagenie_*
+
+  build-for-windows:
+    name: Windows
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-pc-windows-msvc
+            build: windows
+            os: windows-latest
+            arch: x86_64
+          - target: aarch64-pc-windows-msvc
+            build: windows
+            os: windows-latest
+            arch: aarch64
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8.5.1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: "pnpm-lock.yaml"
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          targets: ${{ matrix.target }}
+      - name: Setup Rust Cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+      - name: Build APP
+        shell: pwsh
+        run: |
+          pnpm install
+          $VERSION = node -p "require('./package.json').version"
+          pnpm tauri build -c "{\`"version\`":\`"$VERSION\`"}" -t ${{ matrix.target }} --bundles nsis
+          $APP_NAME = "Imagenie_${VERSION}_${{ matrix.build }}_${{ matrix.arch }}"
+          node scripts/dist.js ${{ matrix.target }} $APP_NAME
+      - name: Upload App
+        uses: actions/upload-artifact@v4
+        with:
+          name: app_${{ matrix.build }}_${{ matrix.arch }}
+          path: dist/Imagenie_*
+
+  release:
+    name: Release
+    needs: [build-for-macos, build-for-windows]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: app_*
+          path: dist
+          merge-multiple: true
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check Version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      - name: Release Imagenie v${{ steps.version.outputs.version }}
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: app-v${{ steps.version.outputs.version }}
+          name: Imagenie v${{ steps.version.outputs.version }}
+          body: Imagenie APP v${{ steps.version.outputs.version }}
+          draft: true
+          prerelease: false
+          makeLatest: latest
+          removeArtifacts: true
+          artifacts: dist/*
