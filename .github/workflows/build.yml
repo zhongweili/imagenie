@@ -90,12 +90,22 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
+      - name: Install NSIS
+        run: |
+          iwr -useb get.scoop.sh -outfile 'install.ps1'
+          .\install.ps1 -RunAsAdmin
+          scoop install nsis
+        shell: pwsh
       - name: Build APP
         shell: pwsh
         run: |
           yarn install
           $VERSION = node -p "require('./package.json').version"
-          yarn tauri build -c "{\`"version\`":\`"$VERSION\`"}" -t ${{ matrix.target }} --bundles nsis
+          $env:TAURI_BUNDLE_NSI = "true"
+          yarn tauri build -c '{\"version\":\"'$VERSION'\"}' -t ${{ matrix.target }} --bundles nsis
+          if ($LASTEXITCODE -ne 0) {
+            throw "Tauri build failed with exit code $LASTEXITCODE"
+          }
           $APP_NAME = "Imagenie_${VERSION}_${{ matrix.build }}_${{ matrix.arch }}"
           node scripts/dist.js ${{ matrix.target }} $APP_NAME
       - name: Upload App

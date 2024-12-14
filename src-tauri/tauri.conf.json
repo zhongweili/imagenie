@@ -54,6 +54,17 @@
     "windows": {
       "webviewInstallMode": {
         "type": "embedBootstrapper"
+      },
+      "nsis": {
+        "installMode": "perMachine",
+        "license": null,
+        "headerImage": null,
+        "sidebarImage": null,
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico",
+        "installerHeader": null,
+        "installerBackground": null,
+        "uninstallerBackground": null
       }
     }
   }
