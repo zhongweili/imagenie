@@ -67,10 +67,11 @@ jobs:
             build: windows
             os: windows-latest
             arch: x86_64
-          - target: aarch64-pc-windows-msvc
-            build: windows
-            os: windows-latest
-            arch: aarch64
+          # Temporarily annotate the ARM64 build
+          # - target: aarch64-pc-windows-msvc
+          #   build: windows
+          #   os: windows-latest
+          #   arch: aarch64
 
     runs-on: ${{ matrix.os }}
     steps:
