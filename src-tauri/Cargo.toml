@@ -1,6 +1,6 @@
 [package]
 name = "imagenie"
-version = "0.2.0"
+version = "0.2.2"
 description = "A Tauri App"
 authors = ["zhongwei"]
 edition = "2021"
