@@ -55,8 +55,8 @@ Background Removal
 
 - [x] Background Removal
 
-- [ ] Support Windows, macOS x86_64
-
+- [x] Support Windows, macOS
+      
 - [ ] Batch Processing
 
 - [ ] Support for Additional AI Models
