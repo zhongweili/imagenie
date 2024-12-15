@@ -5,7 +5,7 @@ use std::marker::PhantomData;
 use super::{ImageModel, ImageProcessingError};
 
 pub struct ModelProcessor<M: ImageModel + Send + Sync> {
-    session: ort::Session,
+    session: ort::session::Session,
     _phantom: PhantomData<M>,
 }
 

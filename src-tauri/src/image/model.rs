@@ -1,5 +1,5 @@
 use image::DynamicImage;
-use ort::{inputs, GraphOptimizationLevel, Session, Value};
+use ort::{inputs, session::builder::GraphOptimizationLevel, session::Session, value::Value};
 use std::marker::PhantomData;
 
 use crate::image::error::ImageProcessingError;

@@ -24,10 +24,10 @@
     "windows": [],
     "security": {
       "csp": {
-        "default-src": "'self'",
         "style-src": "'self' 'unsafe-inline'",
-        "img-src": "'self' asset: https://raw.githubusercontent.com data:",
-        "connect-src": "'self' ipc: https://api.github.com",
+        "img-src": "'self' asset: http://asset.localhost https://raw.githubusercontent.com blob: data:",
+        "default-src": "'self' asset:",
+        "connect-src": "'self' tauri: http://tauri.localhost ipc: http://ipc.localhost http://localhost:8023 ipc: https://api.github.com",
         "script-src": "'self'"
       },
       "assetProtocol": {

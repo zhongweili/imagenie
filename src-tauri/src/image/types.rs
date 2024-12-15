@@ -42,8 +42,8 @@ pub trait NumericType:
     + Send
     + Sync
     + std::fmt::Debug
-    + ort::IntoTensorElementType
-    + ort::PrimitiveTensorElementType
+    // + ort::IntoTensorElementType
+    // + ort::PrimitiveTensorElementType
     + 'static
 {
     fn from_f32(v: f32) -> Self;
