@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "imagenie",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "identifier": "com.imagenie.app",
   "build": {
     "beforeDevCommand": "yarn dev",
@@ -24,10 +24,10 @@
     "windows": [],
     "security": {
       "csp": {
-        "default-src": "'self'",
         "style-src": "'self' 'unsafe-inline'",
-        "img-src": "'self' asset: https://raw.githubusercontent.com data:",
-        "connect-src": "'self' ipc: https://api.github.com",
+        "img-src": "'self' asset: http://asset.localhost https://raw.githubusercontent.com blob: data:",
+        "default-src": "'self' asset:",
+        "connect-src": "'self' tauri: http://tauri.localhost ipc: http://ipc.localhost http://localhost:8023 ipc: https://api.github.com https://api.iconify.design https://api.unisvg.com https://api.simplesvg.com",
         "script-src": "'self'"
       },
       "assetProtocol": {
@@ -54,6 +54,16 @@
     "windows": {
       "webviewInstallMode": {
         "type": "embedBootstrapper"
+      },
+      "nsis": {
+        "installMode": "perMachine",
+        "headerImage": null,
+        "sidebarImage": null,
+        "installerIcon": "icons/icon.ico",
+        "languages": [
+          "English",
+          "SimpChinese"
+        ]
       }
     }
   }
