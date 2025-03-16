@@ -1,0 +1,6 @@
+[site]
+bucket = "./imagenie-landing/build"
+
+[build]
+command = "cd imagenie-landing && npm install && npm run build"
+cwd = "." 
