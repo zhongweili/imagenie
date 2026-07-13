@@ -4,10 +4,10 @@
   "version": "0.2.2",
   "identifier": "com.imagenie.app",
   "build": {
-    "beforeDevCommand": "yarn dev",
+    "beforeDevCommand": "yarn --cwd ../.. dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "yarn build",
-    "frontendDist": "../dist"
+    "beforeBuildCommand": "yarn --cwd ../.. build",
+    "frontendDist": "../../dist"
   },
   "plugins": {
     "allowlist": {

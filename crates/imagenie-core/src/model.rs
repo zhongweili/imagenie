@@ -1,14 +1,14 @@
 use image::DynamicImage;
-use ort::{inputs, session::builder::GraphOptimizationLevel, session::Session, value::Value};
+use ort::session::{Session, builder::GraphOptimizationLevel};
+use ort::value::Value;
 use std::marker::PhantomData;
 
-use crate::image::error::ImageProcessingError;
-use crate::image::tensor::{image_to_tensor, tensor_to_image};
-use crate::image::types::{
-    FaceRestorationParams, NumericType, TensorInput, TensorOutput, UpscalingParams,
+use crate::error::ImageProcessingError;
+use crate::tensor::{image_to_tensor, tensor_to_image};
+use crate::types::{
+    BackgroundRemovalParams, FaceRestorationParams, NumericType, TensorInput, TensorOutput,
+    UpscalingParams,
 };
-
-use super::types::BackgroundRemovalParams;
 
 pub trait ImageModel {
     type Params: Sync + Clone;
@@ -25,9 +25,49 @@ pub trait ImageModel {
         params: &Self::Params,
     ) -> Result<DynamicImage, ImageProcessingError>;
     fn process(
-        session: &Session,
+        session: &mut Session,
         input: &TensorInput<Self::InputType>,
     ) -> Result<TensorOutput<Self::OutputType>, ImageProcessingError>;
+}
+
+pub(crate) fn build_session(model_path: &str) -> Result<Session, ImageProcessingError> {
+    Session::builder()
+        .map_err(|e| ImageProcessingError::Ort(e.to_string()))?
+        .with_optimization_level(GraphOptimizationLevel::Level3)
+        .map_err(|e| ImageProcessingError::Ort(e.to_string()))?
+        .with_intra_threads(4)
+        .map_err(|e| ImageProcessingError::Ort(e.to_string()))?
+        .commit_from_file(model_path)
+        .map_err(|e| ImageProcessingError::Ort(e.to_string()))
+}
+
+fn run_model<T>(
+    session: &mut Session,
+    input: &TensorInput<T>,
+    output_name: Option<&str>,
+    output_channels: usize,
+) -> Result<TensorOutput<T>, ImageProcessingError>
+where
+    T: NumericType + ort::value::PrimitiveTensorElementType,
+{
+    let input_value = Value::from_array(input.clone())?;
+    let outputs = session.run(ort::inputs![input_value])?;
+    let named = output_name.and_then(|name| outputs.get(name));
+    let first;
+    let output = match named {
+        Some(output) => output,
+        None => {
+            first = outputs.values().next().ok_or_else(|| {
+                ImageProcessingError::Processing("No output from model".to_string())
+            })?;
+            &first
+        }
+    };
+    let (shape, data) = output.try_extract_tensor::<T>()?;
+    let dims: Vec<usize> = shape.iter().map(|&d| d as usize).collect();
+
+    ndarray::Array4::from_shape_vec((1, output_channels, dims[2], dims[3]), data.to_vec())
+        .map_err(|e| ImageProcessingError::Processing(e.to_string()))
 }
 
 pub struct UpscalingModel<T = half::f16>(PhantomData<T>);
@@ -38,11 +78,7 @@ impl ImageModel for UpscalingModel<half::f16> {
     type OutputType = half::f16;
 
     fn load_session(model_path: &str) -> Result<Session, ImageProcessingError> {
-        Session::builder()?
-            .with_optimization_level(GraphOptimizationLevel::Level3)?
-            .with_intra_threads(4)?
-            .commit_from_file(model_path)
-            .map_err(|e| ImageProcessingError::Ort(e.to_string()))
+        build_session(model_path)
     }
 
     fn preprocess(
@@ -76,26 +112,10 @@ impl ImageModel for UpscalingModel<half::f16> {
     }
 
     fn process(
-        session: &Session,
+        session: &mut Session,
         input: &TensorInput<Self::InputType>,
     ) -> Result<TensorOutput<Self::OutputType>, ImageProcessingError> {
-        let input_array = input.clone().into_dyn();
-        let input_value = Value::from_array(input_array)?;
-        let inputs = inputs![input_value]?;
-
-        let outputs = session.run(inputs)?;
-        let output = outputs
-            .get("output")
-            .ok_or_else(|| ImageProcessingError::Processing("No output from model".to_string()))?;
-
-        let output_tensor = output.try_extract_tensor::<Self::InputType>()?;
-        let output_shape = output_tensor.shape();
-
-        ndarray::Array4::from_shape_vec(
-            (1, 3, output_shape[2], output_shape[3]),
-            output_tensor.as_slice().unwrap().to_vec(),
-        )
-        .map_err(|e| ImageProcessingError::Processing(e.to_string()))
+        run_model(session, input, Some("output"), 3)
     }
 }
 
@@ -107,11 +127,7 @@ impl ImageModel for FaceRestorationModel<f32> {
     type OutputType = f32;
 
     fn load_session(model_path: &str) -> Result<Session, ImageProcessingError> {
-        Session::builder()?
-            .with_optimization_level(GraphOptimizationLevel::Level3)?
-            .with_intra_threads(4)?
-            .commit_from_file(model_path)
-            .map_err(|e| ImageProcessingError::Ort(e.to_string()))
+        build_session(model_path)
     }
 
     fn preprocess(
@@ -195,27 +211,10 @@ impl ImageModel for FaceRestorationModel<f32> {
     }
 
     fn process(
-        session: &Session,
+        session: &mut Session,
         input: &TensorInput<Self::InputType>,
     ) -> Result<TensorOutput<Self::OutputType>, ImageProcessingError> {
-        let input_array = input.clone().into_dyn();
-        let input_value = Value::from_array(input_array)?;
-        let inputs = inputs![input_value]?;
-
-        let outputs = session.run(inputs)?;
-        let output = outputs
-            .values()
-            .next()
-            .ok_or_else(|| ImageProcessingError::Processing("No output from model".to_string()))?;
-
-        let output_tensor = output.try_extract_tensor::<Self::InputType>()?;
-        let output_shape = output_tensor.shape();
-
-        ndarray::Array4::from_shape_vec(
-            (1, 3, output_shape[2], output_shape[3]),
-            output_tensor.as_slice().unwrap().to_vec(),
-        )
-        .map_err(|e| ImageProcessingError::Processing(e.to_string()))
+        run_model(session, input, None, 3)
     }
 }
 
@@ -226,11 +225,7 @@ impl ImageModel for BackgroundRemovalModel<f32> {
     type OutputType = f32;
 
     fn load_session(model_path: &str) -> Result<Session, ImageProcessingError> {
-        Session::builder()?
-            .with_optimization_level(GraphOptimizationLevel::Level3)?
-            .with_intra_threads(4)?
-            .commit_from_file(model_path)
-            .map_err(|e| ImageProcessingError::Ort(e.to_string()))
+        build_session(model_path)
     }
 
     fn preprocess(
@@ -300,26 +295,9 @@ impl ImageModel for BackgroundRemovalModel<f32> {
     }
 
     fn process(
-        session: &Session,
+        session: &mut Session,
         input: &TensorInput<Self::InputType>,
     ) -> Result<TensorOutput<Self::OutputType>, ImageProcessingError> {
-        let input_array = input.clone().into_dyn();
-        let input_value = Value::from_array(input_array)?;
-        let inputs = inputs![input_value]?;
-
-        let outputs = session.run(inputs)?;
-        let output = outputs
-            .get("output")
-            .ok_or_else(|| ImageProcessingError::Processing("No output from model".to_string()))?;
-
-        let output_tensor = output.try_extract_tensor::<Self::InputType>()?;
-        let output_shape = output_tensor.shape();
-
-        // Create a new tensor with the alpha channel values
-        let alpha_values = output_tensor.as_slice().unwrap().to_vec();
-
-        // The output should match the input dimensions but with single channel
-        ndarray::Array4::from_shape_vec((1, 1, output_shape[2], output_shape[3]), alpha_values)
-            .map_err(|e| ImageProcessingError::Processing(e.to_string()))
+        run_model(session, input, Some("output"), 1)
     }
 }

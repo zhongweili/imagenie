@@ -2,8 +2,8 @@ use std::path::Path;
 use std::sync::OnceLock;
 use tracing::info;
 
-use crate::image::{model::UpscalingModel, processor::ModelProcessor, types::UpscalingParams};
 use crate::utils::models_dir;
+use imagenie_core::{model::UpscalingModel, processor::ModelProcessor, types::UpscalingParams};
 
 static UPSCALE_PROCESSOR: OnceLock<ModelProcessor<UpscalingModel>> = OnceLock::new();
 

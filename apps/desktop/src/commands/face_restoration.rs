@@ -2,9 +2,9 @@ use std::path::Path;
 use std::sync::OnceLock;
 use tracing::info;
 
-use crate::{
-    image::{model::FaceRestorationModel, processor::ModelProcessor, types::FaceRestorationParams},
-    utils::models_dir,
+use crate::utils::models_dir;
+use imagenie_core::{
+    model::FaceRestorationModel, processor::ModelProcessor, types::FaceRestorationParams,
 };
 
 static FACE_RESTORATION_PROCESSOR: OnceLock<ModelProcessor<FaceRestorationModel>> = OnceLock::new();

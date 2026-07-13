@@ -1,0 +1,20 @@
+[package]
+name = "imagenie-core"
+version = "0.1.0"
+description = "Local AI image processing engine (ONNX Runtime)"
+authors = ["zhongwei"]
+edition = "2024"
+license = "MIT"
+
+[dependencies]
+dirs = { workspace = true }
+half = { workspace = true }
+image = { workspace = true }
+ndarray = { workspace = true }
+ort = { workspace = true }
+rayon = { workspace = true }
+reqwest = { workspace = true, features = ["blocking"] }
+serde = { workspace = true }
+sha2 = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }

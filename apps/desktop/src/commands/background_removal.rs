@@ -4,7 +4,7 @@ use std::path::Path;
 use std::sync::OnceLock;
 use tracing::info;
 
-use crate::image::{
+use imagenie_core::{
     model::BackgroundRemovalModel, processor::ModelProcessor, types::BackgroundRemovalParams,
 };
 

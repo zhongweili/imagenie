@@ -1,5 +1,4 @@
 mod commands;
-mod image;
 mod utils;
 
 use std::error::Error;

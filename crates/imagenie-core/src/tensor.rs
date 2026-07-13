@@ -1,7 +1,7 @@
 use image::DynamicImage;
 
-use crate::image::error::ImageProcessingError;
-use crate::image::types::{NumericType, TensorInput, TensorOutput};
+use crate::error::ImageProcessingError;
+use crate::types::{NumericType, TensorInput, TensorOutput};
 
 pub fn image_to_tensor<T: NumericType>(
     image: &DynamicImage,
