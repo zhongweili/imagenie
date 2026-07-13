@@ -1,6 +1,21 @@
 # Handoff: imagenie CLI 改造工程开发
 
-> 交接自 2026-07-13 规划+实验 session。本文档给下一个 session 提供完整上下文，实施 PR1 起的工程开发。开发完成后本文档可删除。
+> 交接自 2026-07-13 规划+实验 session。本文档给下一个 session 提供完整上下文。开发完成后本文档可删除。
+
+## 进度（2026-07-13 更新）
+
+- ✅ **PR1 已完成**（commit `6ce837e`）：workspace 化 + `imagenie-core` 抽取，desktop 行为零变化已验证
+- ✅ **PR2 已完成**（commit `e554cfc`）：`imagenie` CLI 五算子 + models/info/capabilities + `--json` 事件流，click-to-erase 端到端验证通过
+- ⬜ PR3：cargo-dist + Homebrew tap + README 重写
+- ⬜ PR4：desktop commands 层改调 core（rembg 的 apply_mask 逻辑目前在 CLI 和 desktop 各有一份，PR4 应下沉到 core）
+
+PR1/PR2 实施要点（后续 session 需要知道的）：
+- ort 已升 **2.0.0-rc.12**：`Session::run` 改为 `&mut self`，`ModelProcessor` 用 Mutex 包 session（推理串行，预/后处理保持 rayon 并行）
+- LaMa Einsum / SAM encoder 在 Rust ort 验证可跑；LaMa CPU ~4s/张，SAM encode ~1s、decode ~20ms
+- 模型分发已定：现有 3 个走自家 GitHub Release；BiRefNet 走 rembg release URL；SAM（zip，pull 时解包）/LaMa 走 HF；sha256 全部在 `crates/imagenie-core/src/registry.rs`
+- `index.html` 曾在 landing page 拆分时被误删，PR1 已恢复
+- 本地开发：实验模型已软链进 `~/.imagenie/models/`（sam/erase/rembg-hq 不用重新下载）
+- CoreML EP benchmark 未做，遗留到 PR3 之后
 
 ## 项目定位
 
