@@ -1,0 +1,21 @@
+[package]
+name = "imagenie-cli"
+version = "0.1.0"
+description = "Privacy-first image processing for your terminal and your agents"
+authors = ["zhongwei"]
+edition = "2024"
+license = "MIT"
+
+[[bin]]
+name = "imagenie"
+path = "src/main.rs"
+
+[dependencies]
+imagenie-core = { workspace = true }
+anyhow = { workspace = true }
+clap = { version = "4", features = ["derive"] }
+image = { workspace = true }
+indicatif = "0.17"
+rayon = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }

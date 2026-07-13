@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/imagenie-core", "apps/desktop"]
+members = ["crates/imagenie-core", "crates/imagenie-cli", "apps/desktop"]
 
 [workspace.dependencies]
 imagenie-core = { path = "crates/imagenie-core" }
