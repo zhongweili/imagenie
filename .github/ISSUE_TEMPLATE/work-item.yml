@@ -1,0 +1,65 @@
+name: Engineering work item
+description: Propose a measurable Imagenie product or engineering outcome
+title: ""
+labels: []
+body:
+  - type: textarea
+    id: agent_scenario
+    attributes:
+      label: Agent or user scenario
+      description: What task is being attempted, and why does it matter?
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Current problem
+      description: Include current behavior, evidence, and affected operators.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List measurable conditions that make this issue complete.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: dropdown
+    id: schema
+    attributes:
+      label: Agent contract impact
+      options:
+        - No schema impact
+        - Backward-compatible addition
+        - Breaking change
+        - Unknown; needs design review
+    validations:
+      required: true
+  - type: dropdown
+    id: benchmark
+    attributes:
+      label: Benchmark requirement
+      options:
+        - No benchmark required
+        - Performance benchmark required
+        - Quality evaluation required
+        - Both quality and performance required
+    validations:
+      required: true
+  - type: textarea
+    id: model_risk
+    attributes:
+      label: Model, license, and distribution impact
+      description: Provide source/license/hash implications, or state that there is no model impact.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Completion evidence
+      description: Identify the tests, fixtures, benchmark report, or documentation expected in the PR.
+    validations:
+      required: true

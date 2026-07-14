@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "reference_environments": [
+    {
+      "id": "macos-apple-silicon",
+      "required": true
+    },
+    {
+      "id": "linux-x86_64",
+      "required": true
+    }
+  ],
+  "operators": {
+    "rembg": { "cases": [], "primary_metrics": ["iou", "boundary_f_score"] },
+    "upscale": { "cases": [], "primary_metrics": ["psnr", "ssim", "lpips"] },
+    "restore": { "cases": [], "primary_metrics": ["identity_similarity", "face_quality"] },
+    "segment": { "cases": [], "primary_metrics": ["prompt_iou", "success_rate"] },
+    "erase": { "cases": [], "primary_metrics": ["boundary_artifact_score", "pairwise_preference"] },
+    "segment_erase": { "cases": [], "primary_metrics": ["task_success_rate", "total_latency_ms"] }
+  }
+}

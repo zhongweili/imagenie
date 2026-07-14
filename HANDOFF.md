@@ -9,6 +9,10 @@
 - ⬜ PR3：cargo-dist + Homebrew tap + README 重写
 - ⬜ PR4：desktop commands 层改调 core（rembg 的 apply_mask 逻辑目前在 CLI 和 desktop 各有一份，PR4 应下沉到 core）
 
+2026-07-14 后续推进：
+- 🚧 **v0.1 Agent Contract + Eval**：已新增产品规格、路线图、JSONL v1 schema、版本化 capabilities、CLI 契约测试、benchmark manifest 和贡献/PR/Issue 模板。
+- 下一步应先收敛统一 core API、填充代表性评测数据并建立质量/性能 baseline，再做 cargo-dist 发布；原 PR3/PR4 顺序建议据此调整。
+
 PR1/PR2 实施要点（后续 session 需要知道的）：
 - ort 已升 **2.0.0-rc.12**：`Session::run` 改为 `&mut self`，`ModelProcessor` 用 Mutex 包 session（推理串行，预/后处理保持 rayon 并行）
 - LaMa Einsum / SAM encoder 在 Rust ort 验证可跑；LaMa CPU ~4s/张，SAM encode ~1s、decode ~20ms

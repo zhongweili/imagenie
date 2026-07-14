@@ -57,6 +57,9 @@ pub struct CommonArgs {
     /// Emit machine-readable JSONL events on stdout.
     #[arg(long)]
     pub json: bool,
+    /// Caller-provided correlation ID included in every JSONL event.
+    #[arg(long)]
+    pub request_id: Option<String>,
     /// Auto-download missing models without prompting.
     #[arg(short = 'y', long)]
     pub yes: bool,
@@ -97,7 +100,7 @@ pub enum Command {
     Segment {
         input: String,
         /// Point prompt "x,y" in pixels
-        #[arg(long, conflicts_with = "r#box")]
+        #[arg(long, conflicts_with = "box")]
         point: Option<String>,
         /// Box prompt "x1,y1,x2,y2" in pixels
         #[arg(long = "box")]

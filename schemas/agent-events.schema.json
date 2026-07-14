@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://imagenie.dev/schemas/agent-events-v1.json",
+  "title": "Imagenie Agent Event v1",
+  "oneOf": [
+    { "$ref": "#/$defs/start" },
+    { "$ref": "#/$defs/done" },
+    { "$ref": "#/$defs/skipped" },
+    { "$ref": "#/$defs/errorEvent" },
+    { "$ref": "#/$defs/summary" }
+  ],
+  "$defs": {
+    "model": {
+      "type": "object",
+      "required": ["name", "artifact_sha256"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "artifact_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "iou": { "type": "number", "minimum": 0, "maximum": 1 },
+        "mask_pixels": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "error": {
+      "type": "object",
+      "required": ["code", "message", "recovery"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "input_unreadable",
+            "invalid_argument",
+            "model_load_failed",
+            "model_missing",
+            "output_dir_failed",
+            "output_exists",
+            "output_write_failed",
+            "pipe_conflict",
+            "processing_failed"
+          ]
+        },
+        "message": { "type": "string", "minLength": 1 },
+        "recovery": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "start": {
+      "type": "object",
+      "required": ["schema_version", "request_id", "operator", "model", "event", "input_index", "input"],
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "request_id": { "type": "string", "minLength": 1 },
+        "operator": { "type": "string", "minLength": 1 },
+        "model": { "$ref": "#/$defs/model" },
+        "event": { "const": "start" },
+        "input_index": { "type": "integer", "minimum": 0 },
+        "input": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "done": {
+      "type": "object",
+      "required": ["schema_version", "request_id", "operator", "model", "event", "input_index", "input", "output", "duration_ms", "metrics", "warnings"],
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "request_id": { "type": "string", "minLength": 1 },
+        "operator": { "type": "string", "minLength": 1 },
+        "model": { "$ref": "#/$defs/model" },
+        "event": { "const": "done" },
+        "input_index": { "type": "integer", "minimum": 0 },
+        "input": { "type": "string" },
+        "output": { "type": "string" },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "metrics": { "$ref": "#/$defs/metrics" },
+        "warnings": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "skipped": {
+      "type": "object",
+      "required": ["schema_version", "request_id", "operator", "model", "event", "input_index", "input", "output", "reason"],
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "request_id": { "type": "string", "minLength": 1 },
+        "operator": { "type": "string", "minLength": 1 },
+        "model": { "$ref": "#/$defs/model" },
+        "event": { "const": "skipped" },
+        "input_index": { "type": "integer", "minimum": 0 },
+        "input": { "type": "string" },
+        "output": { "type": "string" },
+        "reason": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "errorEvent": {
+      "type": "object",
+      "required": ["schema_version", "request_id", "operator", "model", "event", "input_index", "input", "error"],
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "request_id": { "type": "string", "minLength": 1 },
+        "operator": { "type": "string", "minLength": 1 },
+        "model": { "$ref": "#/$defs/model" },
+        "event": { "const": "error" },
+        "input_index": { "type": "integer", "minimum": 0 },
+        "input": { "type": "string" },
+        "error": { "$ref": "#/$defs/error" }
+      },
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "object",
+      "required": ["schema_version", "request_id", "operator", "model", "event", "duration_ms", "total", "succeeded", "failed", "skipped"],
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "request_id": { "type": "string", "minLength": 1 },
+        "operator": { "type": "string", "minLength": 1 },
+        "model": { "$ref": "#/$defs/model" },
+        "event": { "const": "summary" },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 0 },
+        "succeeded": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "skipped": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  }
+}
