@@ -1,0 +1,419 @@
+{
+  "schema_version": "1.0",
+  "suite_id": "local-development",
+  "description": "Local performance smoke suite; inputs are gitignored and not licensed as release fixtures.",
+  "generated_at": "2026-07-14T07:26:52+00:00",
+  "dataset": {
+    "status": "local_only_unverified_license",
+    "quality_gate": false
+  },
+  "cases": [
+    {
+      "id": "rembg-fast-animal",
+      "report": {
+        "schema_version": "1.0",
+        "generated_at_unix_ms": 1784013941505,
+        "environment": {
+          "os": "macos",
+          "arch": "aarch64",
+          "logical_cpus": 16,
+          "cpu_model": "Apple M3 Max",
+          "memory_bytes": 68719476736,
+          "execution_provider": "cpu",
+          "intra_threads": 4,
+          "memory_pattern": true
+        },
+        "git": {
+          "commit": "275e0e7c9dd1b82bae78325487eca0acb44b227f",
+          "dirty": false
+        },
+        "case": {
+          "operator": "rembg",
+          "input": "experiments/images/animal-1.jpg",
+          "input_sha256": "4ddbd2f88e516892df62b73005a32965dde9a06d9b5565aad78f1b91ff53a6d7",
+          "input_width": 1000,
+          "input_height": 667,
+          "point": null,
+          "mask": null,
+          "dilate": null,
+          "models": [
+            {
+              "name": "rembg",
+              "artifact_sha256": "b6e8497ba978a6f5fbb647e419d2696cd80df5a23cb6a8ea532021911bd76acb",
+              "size_bytes": 88188479
+            }
+          ]
+        },
+        "measurements": {
+          "model_load_ms": 90.952541,
+          "cold_ms": 1023.2053750000001,
+          "warmups": 1,
+          "warm_iterations": 3,
+          "warm_ms": [
+            994.156834,
+            993.7175000000001,
+            984.082166
+          ],
+          "warm_stats": {
+            "min_ms": 984.082166,
+            "mean_ms": 990.6521666666667,
+            "p50_ms": 993.7175000000001,
+            "p95_ms": 994.156834,
+            "max_ms": 994.156834
+          },
+          "peak_rss_bytes": 1789837312
+        },
+        "result": {
+          "output_width": 1000,
+          "output_height": 667,
+          "metrics": {},
+          "warnings": [],
+          "saved_to": null,
+          "quality_status": "not_evaluated"
+        }
+      },
+      "stderr": null
+    },
+    {
+      "id": "rembg-high-animal",
+      "report": {
+        "schema_version": "1.0",
+        "generated_at_unix_ms": 1784013961867,
+        "environment": {
+          "os": "macos",
+          "arch": "aarch64",
+          "logical_cpus": 16,
+          "cpu_model": "Apple M3 Max",
+          "memory_bytes": 68719476736,
+          "execution_provider": "cpu",
+          "intra_threads": 4,
+          "memory_pattern": false
+        },
+        "git": {
+          "commit": "275e0e7c9dd1b82bae78325487eca0acb44b227f",
+          "dirty": false
+        },
+        "case": {
+          "operator": "rembg-high",
+          "input": "experiments/images/animal-1.jpg",
+          "input_sha256": "4ddbd2f88e516892df62b73005a32965dde9a06d9b5565aad78f1b91ff53a6d7",
+          "input_width": 1000,
+          "input_height": 667,
+          "point": null,
+          "mask": null,
+          "dilate": null,
+          "models": [
+            {
+              "name": "rembg-hq",
+              "artifact_sha256": "5600024376f572a557870a5eb0afb1e5961636bef4e1e22132025467d0f03333",
+              "size_bytes": 224005088
+            }
+          ]
+        },
+        "measurements": {
+          "model_load_ms": 993.4757910000001,
+          "cold_ms": 4246.2141249999995,
+          "warmups": 1,
+          "warm_iterations": 3,
+          "warm_ms": [
+            3749.52125,
+            3768.416875,
+            3762.1155000000003
+          ],
+          "warm_stats": {
+            "min_ms": 3749.52125,
+            "mean_ms": 3760.017875,
+            "p50_ms": 3762.1155000000003,
+            "p95_ms": 3768.416875,
+            "max_ms": 3768.416875
+          },
+          "peak_rss_bytes": 7154810880
+        },
+        "result": {
+          "output_width": 1000,
+          "output_height": 667,
+          "metrics": {},
+          "warnings": [],
+          "saved_to": null,
+          "quality_status": "not_evaluated"
+        }
+      },
+      "stderr": null
+    },
+    {
+      "id": "upscale-animal",
+      "report": {
+        "schema_version": "1.0",
+        "generated_at_unix_ms": 1784013993378,
+        "environment": {
+          "os": "macos",
+          "arch": "aarch64",
+          "logical_cpus": 16,
+          "cpu_model": "Apple M3 Max",
+          "memory_bytes": 68719476736,
+          "execution_provider": "cpu",
+          "intra_threads": 12,
+          "memory_pattern": true
+        },
+        "git": {
+          "commit": "275e0e7c9dd1b82bae78325487eca0acb44b227f",
+          "dirty": false
+        },
+        "case": {
+          "operator": "upscale",
+          "input": "experiments/images/animal-1.jpg",
+          "input_sha256": "4ddbd2f88e516892df62b73005a32965dde9a06d9b5565aad78f1b91ff53a6d7",
+          "input_width": 1000,
+          "input_height": 667,
+          "point": null,
+          "mask": null,
+          "dilate": null,
+          "models": [
+            {
+              "name": "upscale",
+              "artifact_sha256": "22a5d72274bacd09a33dba691cc02f0819c3da218ed382e1e318e34a993a7ffe",
+              "size_bytes": 36145554
+            }
+          ]
+        },
+        "measurements": {
+          "model_load_ms": 76.87774999999999,
+          "cold_ms": 7840.9675,
+          "warmups": 0,
+          "warm_iterations": 3,
+          "warm_ms": [
+            7487.246749999999,
+            7840.937542,
+            8065.844
+          ],
+          "warm_stats": {
+            "min_ms": 7487.246749999999,
+            "mean_ms": 7798.009430666666,
+            "p50_ms": 7840.937542,
+            "p95_ms": 8065.844,
+            "max_ms": 8065.844
+          },
+          "peak_rss_bytes": 3880845312
+        },
+        "result": {
+          "output_width": 2000,
+          "output_height": 1336,
+          "metrics": {},
+          "warnings": [],
+          "saved_to": null,
+          "quality_status": "not_evaluated"
+        }
+      },
+      "stderr": null
+    },
+    {
+      "id": "restore-face",
+      "report": {
+        "schema_version": "1.0",
+        "generated_at_unix_ms": 1784013998510,
+        "environment": {
+          "os": "macos",
+          "arch": "aarch64",
+          "logical_cpus": 16,
+          "cpu_model": "Apple M3 Max",
+          "memory_bytes": 68719476736,
+          "execution_provider": "cpu",
+          "intra_threads": 4,
+          "memory_pattern": true
+        },
+        "git": {
+          "commit": "275e0e7c9dd1b82bae78325487eca0acb44b227f",
+          "dirty": false
+        },
+        "case": {
+          "operator": "restore",
+          "input": "experiments/images/girl-1.jpg",
+          "input_sha256": "ca91ea767d9b2605e6cebad8149ea1b74e8e2c292649e563218cf453b29a9c16",
+          "input_width": 600,
+          "input_height": 399,
+          "point": null,
+          "mask": null,
+          "dilate": null,
+          "models": [
+            {
+              "name": "restore",
+              "artifact_sha256": "9abba1f14737d8f83f66dab9abba28d7ef1ecf1f02bebb49f778f884820750a4",
+              "size_bytes": 340256689
+            }
+          ]
+        },
+        "measurements": {
+          "model_load_ms": 180.21275,
+          "cold_ms": 1247.570625,
+          "warmups": 0,
+          "warm_iterations": 3,
+          "warm_ms": [
+            1213.3318749999999,
+            1218.245875,
+            1164.519667
+          ],
+          "warm_stats": {
+            "min_ms": 1164.519667,
+            "mean_ms": 1198.699139,
+            "p50_ms": 1213.3318749999999,
+            "p95_ms": 1218.245875,
+            "max_ms": 1218.245875
+          },
+          "peak_rss_bytes": 1516584960
+        },
+        "result": {
+          "output_width": 600,
+          "output_height": 399,
+          "metrics": {},
+          "warnings": [],
+          "saved_to": null,
+          "quality_status": "not_evaluated"
+        }
+      },
+      "stderr": null
+    },
+    {
+      "id": "segment-animal",
+      "report": {
+        "schema_version": "1.0",
+        "generated_at_unix_ms": 1784014000302,
+        "environment": {
+          "os": "macos",
+          "arch": "aarch64",
+          "logical_cpus": 16,
+          "cpu_model": "Apple M3 Max",
+          "memory_bytes": 68719476736,
+          "execution_provider": "cpu",
+          "intra_threads": 4,
+          "memory_pattern": true
+        },
+        "git": {
+          "commit": "275e0e7c9dd1b82bae78325487eca0acb44b227f",
+          "dirty": false
+        },
+        "case": {
+          "operator": "segment",
+          "input": "experiments/images/animal-1.jpg",
+          "input_sha256": "4ddbd2f88e516892df62b73005a32965dde9a06d9b5565aad78f1b91ff53a6d7",
+          "input_width": 1000,
+          "input_height": 667,
+          "point": "0.8,0.5",
+          "mask": null,
+          "dilate": null,
+          "models": [
+            {
+              "name": "sam",
+              "artifact_sha256": "c602cb3f6fd297312a415f885f0df3f0eef9fbb334b069c9d30e828f2ae7c69a",
+              "size_bytes": 116507723
+            }
+          ]
+        },
+        "measurements": {
+          "model_load_ms": 571.0695420000001,
+          "cold_ms": 1029.275708,
+          "warmups": 1,
+          "warm_iterations": 3,
+          "warm_ms": [
+            25.590333,
+            25.268333000000002,
+            26.193667
+          ],
+          "warm_stats": {
+            "min_ms": 25.268333000000002,
+            "mean_ms": 25.684111,
+            "p50_ms": 25.590333,
+            "p95_ms": 26.193667,
+            "max_ms": 26.193667
+          },
+          "peak_rss_bytes": 1781137408
+        },
+        "result": {
+          "output_width": 1000,
+          "output_height": 667,
+          "metrics": {
+            "iou": 0.724177,
+            "mask_pixels": 72
+          },
+          "warnings": [],
+          "saved_to": null,
+          "quality_status": "not_evaluated"
+        }
+      },
+      "stderr": null
+    },
+    {
+      "id": "click-erase-animal",
+      "report": {
+        "schema_version": "1.0",
+        "generated_at_unix_ms": 1784014012161,
+        "environment": {
+          "os": "macos",
+          "arch": "aarch64",
+          "logical_cpus": 16,
+          "cpu_model": "Apple M3 Max",
+          "memory_bytes": 68719476736,
+          "execution_provider": "cpu",
+          "intra_threads": 4,
+          "memory_pattern": true
+        },
+        "git": {
+          "commit": "275e0e7c9dd1b82bae78325487eca0acb44b227f",
+          "dirty": false
+        },
+        "case": {
+          "operator": "click-erase",
+          "input": "experiments/images/animal-1.jpg",
+          "input_sha256": "4ddbd2f88e516892df62b73005a32965dde9a06d9b5565aad78f1b91ff53a6d7",
+          "input_width": 1000,
+          "input_height": 667,
+          "point": "0.8,0.5",
+          "mask": null,
+          "dilate": 12,
+          "models": [
+            {
+              "name": "sam",
+              "artifact_sha256": "c602cb3f6fd297312a415f885f0df3f0eef9fbb334b069c9d30e828f2ae7c69a",
+              "size_bytes": 116507723
+            },
+            {
+              "name": "erase",
+              "artifact_sha256": "1faef5301d78db7dda502fe59966957ec4b79dd64e16f03ed96913c7a4eb68d6",
+              "size_bytes": 208044816
+            }
+          ]
+        },
+        "measurements": {
+          "model_load_ms": 2803.796208,
+          "cold_ms": 2973.0101250000002,
+          "warmups": 0,
+          "warm_iterations": 3,
+          "warm_ms": [
+            1993.111667,
+            2032.146875,
+            1966.857625
+          ],
+          "warm_stats": {
+            "min_ms": 1966.857625,
+            "mean_ms": 1997.3720556666667,
+            "p50_ms": 1993.111667,
+            "p95_ms": 2032.146875,
+            "max_ms": 2032.146875
+          },
+          "peak_rss_bytes": 2468560896
+        },
+        "result": {
+          "output_width": 1000,
+          "output_height": 667,
+          "metrics": {
+            "iou": 0.724177,
+            "mask_pixels": 72
+          },
+          "warnings": [],
+          "saved_to": null,
+          "quality_status": "not_evaluated"
+        }
+      },
+      "stderr": null
+    }
+  ]
+}

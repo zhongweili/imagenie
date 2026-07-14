@@ -13,7 +13,9 @@
 - 🚧 **v0.1 Agent Contract + Eval**：已新增产品规格、路线图、JSONL v1 schema、版本化 capabilities、CLI 契约测试、benchmark manifest 和贡献/PR/Issue 模板。
 - ✅ **Core API 第一阶段**：新增 `ImageOperator`/`ParameterizedImageOperator`/`ProcessOutput`；CLI 五算子均走 core facade，desktop 的 upscale/restore/rembg 同步迁移；rembg alpha 合成和 erase mask 膨胀下沉 core，SAM operator 会按输入路径/大小/mtime 复用 embedding。
 - ✅ **性能 baseline 第一阶段**：新增隔离进程 release-mode runner，在 M3 Max/CPU EP 上记录了六个算子的 clean-commit cold/warm/RSS 基线；SAM 热分割约 28ms，当前最大风险是 rembg-high 峰值约 11GiB 和 upscale 热延迟约 19.2s。
-- 下一步补齐有明确许可和标注的质量数据集，同时 profile rembg-high/upscale，再按不低于 20% 的量化目标做 runtime/CoreML、分辨率或 tiling 优化，最后进入 cargo-dist 发布。
+- ✅ **运行时优化第一阶段**：BiRefNet 关闭 ORT memory pattern 后峰值从 11.03GiB 降至 6.67GiB（-39.6%）；upscale 在最多 12 个 intra-op 线程下热 p50 从 19.2s 降至 7.84s（-59.2%），两项输出 SHA 与原配置一致；CoreML 未达到 20% 收益，暂不进入产品默认。
+- 🚧 **质量 gate**：已有逐图作者/许可/落地页/SHA/标注方法验证器、Open Images 下载准备器与 Rust mask-IoU 评测；当前只导入首个 smoke case，仍需扩充到代表性最小数量。
+- 下一步扩充有明确许可和标注的质量数据集并增加 boundary F-score、PSNR/SSIM 等指标；达到 gate 后再做模型、分辨率或 tiling 优化，最后进入 cargo-dist 发布。
 
 PR1/PR2 实施要点（后续 session 需要知道的）：
 - ort 已升 **2.0.0-rc.12**：`Session::run` 改为 `&mut self`，`ModelProcessor` 用 Mutex 包 session（推理串行，预/后处理保持 rayon 并行）

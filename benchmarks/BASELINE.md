@@ -56,3 +56,23 @@ Initial candidate targets on this exact input and environment are:
 Every performance PR must include the baseline and candidate reports from the
 same commit state, input checksums, model checksums, and environment. A faster
 result does not merge if quality is unmeasured or regresses beyond the gate.
+
+## First accepted runtime candidate
+
+Commit `275e0e7` introduced operator-specific CPU settings without changing the
+agent contract. The clean-commit [candidate report](reports/local-development-20260714T072652Z.md)
+records the following changes against this baseline:
+
+| Operator and metric | Baseline | Candidate | Change |
+| --- | ---: | ---: | ---: |
+| rembg-high peak RSS | 11.03 GiB | 6.67 GiB | -39.6% |
+| rembg-high warm p50 | 3,714 ms | 3,762 ms | +1.3% |
+| upscale warm p50 | 19,216 ms | 7,841 ms | -59.2% |
+| upscale peak RSS | 3.62 GiB | 3.61 GiB | -0.2% |
+
+Both target improvements exceed the 20% milestone. Other operator warm p50
+changes remained between -7.0% and +3.8%. Baseline and candidate output PNGs
+for the two changed operators had identical SHA-256 hashes. Representative
+quality coverage remains blocked until the fixture set reaches its minimum
+counts; exact output equality is evidence for these runtime-only changes, not a
+substitute for the broader quality gate.

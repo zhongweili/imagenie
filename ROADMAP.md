@@ -43,9 +43,10 @@ Exit criteria:
 1. ✅ Freeze the v0.1 Agent Contract and evaluation harness.
 2. ✅ Converge CLI and desktop processing through one `imagenie-core` API.
 3. 🚧 Establish and improve model quality and performance baselines. The first
-   clean macOS/Apple Silicon CPU performance baseline is recorded in
-   `benchmarks/BASELINE.md`; licensed quality fixtures remain the blocking
-   prerequisite.
+   clean macOS/Apple Silicon CPU performance baseline and first accepted
+   runtime candidate are recorded in `benchmarks/BASELINE.md`; licensed quality
+   fixture import and mask-IoU evaluation now work, while representative case
+   counts remain the blocking prerequisite.
 4. Add cargo-dist, release automation, Homebrew, and agent-first documentation.
 5. Build ecosystem adapters only after the CLI contract is stable.
 
