@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "cases": [
+    {
+      "id": "open-images-boy-114d6b81-segment",
+      "operator": "segment",
+      "image_id": "114d6b81e7b1fa08",
+      "mask_path": "114d6b81e7b1fa08_m01bl7v_b62eb236.png",
+      "prompt": { "x": 0.25, "y": 0.5 },
+      "metrics": ["prompt_iou", "success_rate"],
+      "review": "Prompt was manually verified inside the annotated boy instance."
+    }
+  ]
+}

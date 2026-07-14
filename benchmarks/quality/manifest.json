@@ -16,8 +16,8 @@
   },
   "approved_sources": [
     {
-      "id": "open-images-v7",
-      "homepage": "https://storage.googleapis.com/openimages/web/index.html",
+      "id": "open-images-v5",
+      "homepage": "https://storage.googleapis.com/openimages/web/factsfigures_v5.html",
       "annotation_license": {
         "name": "CC-BY-4.0",
         "url": "https://creativecommons.org/licenses/by/4.0/"

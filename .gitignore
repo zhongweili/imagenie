@@ -25,3 +25,8 @@ dist-ssr
 
 # Rust
 target
+
+# Downloaded benchmark fixtures (provenance stays in tracked selections/manifests)
+benchmarks/quality/assets/
+benchmarks/quality/.cache/
+benchmarks/quality/generated-manifest.json

@@ -69,6 +69,20 @@ Release automation must add `--require-ready`. That mode intentionally fails
 until every operator reaches its minimum case count and all blockers have been
 removed.
 
+Prepare the tracked Open Images selections and run the currently supported
+mask-IoU smoke cases with:
+
+```sh
+python3 benchmarks/prepare_openimages.py
+python3 benchmarks/validate_quality_manifest.py benchmarks/quality/generated-manifest.json
+python3 benchmarks/run_quality.py
+```
+
+Downloaded assets and the generated manifest stay outside git. The tracked
+selection file contains stable Open Images IDs, mask names, prompts, and review
+notes; the preparation step rechecks official author, landing-page, and license
+metadata before hashing each local asset.
+
 Open Images V7 is the first approved candidate source because its official
 metadata includes original landing pages, authors, and license information, and
 its annotations are CC BY 4.0. The official download documentation also warns

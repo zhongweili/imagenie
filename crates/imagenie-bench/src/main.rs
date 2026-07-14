@@ -74,6 +74,9 @@ struct Args {
     /// Mask path used by erase.
     #[arg(long)]
     mask: Option<PathBuf>,
+    /// Ground-truth mask used to calculate quality IoU for rembg/segment.
+    #[arg(long)]
+    reference: Option<PathBuf>,
     #[arg(long, default_value = "12")]
     dilate: u32,
     /// Unmeasured runs after the cold run and before recorded warm runs.
@@ -243,6 +246,8 @@ struct CaseReport {
     input_height: u32,
     point: Option<String>,
     mask: Option<String>,
+    reference: Option<String>,
+    reference_sha256: Option<String>,
     dilate: Option<u32>,
     models: Vec<ModelReport>,
 }
@@ -282,6 +287,12 @@ struct ResultReport {
     warnings: Vec<String>,
     saved_to: Option<String>,
     quality_status: &'static str,
+    quality_metrics: Option<QualityMetrics>,
+}
+
+#[derive(Serialize)]
+struct QualityMetrics {
+    iou: f64,
 }
 
 fn main() -> Result<()> {
@@ -325,6 +336,12 @@ fn main() -> Result<()> {
     } else {
         None
     };
+    let quality_metrics = args
+        .reference
+        .as_ref()
+        .map(|reference| mask_iou(args.operator, &output.image, reference))
+        .transpose()?
+        .map(|iou| QualityMetrics { iou });
 
     let report = Report {
         schema_version: REPORT_SCHEMA_VERSION,
@@ -346,6 +363,15 @@ fn main() -> Result<()> {
                 .mask
                 .as_ref()
                 .map(|path| path.to_string_lossy().into_owned()),
+            reference: args
+                .reference
+                .as_ref()
+                .map(|path| path.to_string_lossy().into_owned()),
+            reference_sha256: args
+                .reference
+                .as_ref()
+                .map(|path| sha256_file(path))
+                .transpose()?,
             dilate: matches!(
                 args.operator,
                 OperatorKind::Erase | OperatorKind::ClickErase
@@ -368,7 +394,12 @@ fn main() -> Result<()> {
             metrics: output.metrics,
             warnings: output.warnings,
             saved_to,
-            quality_status: "not_evaluated",
+            quality_status: if quality_metrics.is_some() {
+                "evaluated"
+            } else {
+                "not_evaluated"
+            },
+            quality_metrics,
         },
     };
 
@@ -467,6 +498,38 @@ fn sha256_file(path: &Path) -> Result<String> {
         hasher.update(&buffer[..count]);
     }
     Ok(format!("{:x}", hasher.finalize()))
+}
+
+fn mask_iou(operator: OperatorKind, output: &image::DynamicImage, reference: &Path) -> Result<f64> {
+    let predicted = match operator {
+        OperatorKind::Segment => output.to_luma8(),
+        OperatorKind::Rembg | OperatorKind::RembgHigh => {
+            let rgba = output.to_rgba8();
+            image::GrayImage::from_fn(rgba.width(), rgba.height(), |x, y| {
+                image::Luma([rgba.get_pixel(x, y)[3]])
+            })
+        }
+        _ => bail!("--reference IoU is only supported for rembg and segment operators"),
+    };
+    let reference = image::open(reference)?.to_luma8();
+    let reference = image::imageops::resize(
+        &reference,
+        predicted.width(),
+        predicted.height(),
+        image::imageops::FilterType::Nearest,
+    );
+    let mut intersection = 0u64;
+    let mut union = 0u64;
+    for (predicted, expected) in predicted.pixels().zip(reference.pixels()) {
+        let predicted = predicted[0] > 127;
+        let expected = expected[0] > 127;
+        intersection += u64::from(predicted && expected);
+        union += u64::from(predicted || expected);
+    }
+    if union == 0 {
+        bail!("quality IoU is undefined because both masks are empty");
+    }
+    Ok(intersection as f64 / union as f64)
 }
 
 fn runtime_options(args: &Args) -> RuntimeOptions {
@@ -599,5 +662,20 @@ mod tests {
             }
             Prompt::Box { .. } => panic!("expected point"),
         }
+    }
+
+    #[test]
+    fn mask_iou_uses_binary_overlap() {
+        let output = image::DynamicImage::ImageLuma8(
+            image::GrayImage::from_raw(2, 2, vec![255, 255, 0, 0]).unwrap(),
+        );
+        let path = std::env::temp_dir().join(format!("imagenie-iou-{}.png", std::process::id()));
+        image::GrayImage::from_raw(2, 2, vec![255, 0, 255, 0])
+            .unwrap()
+            .save(&path)
+            .unwrap();
+        let iou = mask_iou(OperatorKind::Segment, &output, &path).unwrap();
+        std::fs::remove_file(path).ok();
+        assert!((iou - 1.0 / 3.0).abs() < f64::EPSILON);
     }
 }
