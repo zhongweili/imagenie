@@ -12,7 +12,8 @@
 2026-07-14 后续推进：
 - 🚧 **v0.1 Agent Contract + Eval**：已新增产品规格、路线图、JSONL v1 schema、版本化 capabilities、CLI 契约测试、benchmark manifest 和贡献/PR/Issue 模板。
 - ✅ **Core API 第一阶段**：新增 `ImageOperator`/`ParameterizedImageOperator`/`ProcessOutput`；CLI 五算子均走 core facade，desktop 的 upscale/restore/rembg 同步迁移；rembg alpha 合成和 erase mask 膨胀下沉 core，SAM operator 会按输入路径/大小/mtime 复用 embedding。
-- 下一步填充代表性评测数据并建立质量/性能 baseline，再根据结果做 runtime/CoreML 和模型优化，最后进入 cargo-dist 发布。
+- ✅ **性能 baseline 第一阶段**：新增隔离进程 release-mode runner，在 M3 Max/CPU EP 上记录了六个算子的 clean-commit cold/warm/RSS 基线；SAM 热分割约 28ms，当前最大风险是 rembg-high 峰值约 11GiB 和 upscale 热延迟约 19.2s。
+- 下一步补齐有明确许可和标注的质量数据集，同时 profile rembg-high/upscale，再按不低于 20% 的量化目标做 runtime/CoreML、分辨率或 tiling 优化，最后进入 cargo-dist 发布。
 
 PR1/PR2 实施要点（后续 session 需要知道的）：
 - ort 已升 **2.0.0-rc.12**：`Session::run` 改为 `&mut self`，`ModelProcessor` 用 Mutex 包 session（推理串行，预/后处理保持 rayon 并行）
