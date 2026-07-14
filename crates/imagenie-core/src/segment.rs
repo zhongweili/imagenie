@@ -6,8 +6,8 @@ use std::sync::Mutex;
 use std::time::SystemTime;
 
 use crate::error::ImageProcessingError;
-use crate::model::build_session;
 use crate::operation::{ParameterizedImageOperator, ProcessMetrics, ProcessOutput};
+use crate::runtime::{RuntimeOptions, build_session};
 
 pub const SAM_SIZE: usize = 1024;
 
@@ -79,9 +79,17 @@ pub struct SegmentOperator {
 
 impl SegmentOperator {
     pub fn new(encoder_path: &str, decoder_path: &str) -> Result<Self, ImageProcessingError> {
+        Self::new_with_runtime(encoder_path, decoder_path, RuntimeOptions::default())
+    }
+
+    pub fn new_with_runtime(
+        encoder_path: &str,
+        decoder_path: &str,
+        runtime: RuntimeOptions,
+    ) -> Result<Self, ImageProcessingError> {
         Ok(Self {
             state: Mutex::new(SegmentState {
-                segmenter: Segmenter::new(encoder_path, decoder_path)?,
+                segmenter: Segmenter::new_with_runtime(encoder_path, decoder_path, runtime)?,
                 source: None,
             }),
         })
@@ -128,9 +136,17 @@ impl ParameterizedImageOperator<Prompt> for SegmentOperator {
 
 impl Segmenter {
     pub fn new(encoder_path: &str, decoder_path: &str) -> Result<Self, ImageProcessingError> {
+        Self::new_with_runtime(encoder_path, decoder_path, RuntimeOptions::default())
+    }
+
+    pub fn new_with_runtime(
+        encoder_path: &str,
+        decoder_path: &str,
+        runtime: RuntimeOptions,
+    ) -> Result<Self, ImageProcessingError> {
         Ok(Self {
-            encoder: build_session(encoder_path)?,
-            decoder: build_session(decoder_path)?,
+            encoder: build_session(encoder_path, &runtime)?,
+            decoder: build_session(decoder_path, &runtime)?,
             embedding: None,
         })
     }

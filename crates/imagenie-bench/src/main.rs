@@ -5,6 +5,7 @@ use imagenie_core::birefnet::BiRefNetModel;
 use imagenie_core::erase::{EraseOperator, EraseParams};
 use imagenie_core::model::{BackgroundRemovalModel, FaceRestorationModel, UpscalingModel};
 use imagenie_core::registry;
+use imagenie_core::runtime::{ExecutionProvider, RuntimeOptions};
 use imagenie_core::segment::{Prompt, SegmentOperator};
 use imagenie_core::types::{BackgroundRemovalParams, FaceRestorationParams, UpscalingParams};
 use imagenie_core::{
@@ -29,6 +30,21 @@ enum OperatorKind {
     Segment,
     Erase,
     ClickErase,
+}
+
+#[derive(Clone, Copy, Debug, ValueEnum)]
+enum RuntimeProvider {
+    Cpu,
+    CoreMl,
+}
+
+impl RuntimeProvider {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::Cpu => "cpu",
+            Self::CoreMl => "coreml",
+        }
+    }
 }
 
 impl OperatorKind {
@@ -65,6 +81,12 @@ struct Args {
     warmups: usize,
     #[arg(long, default_value = "3")]
     iterations: usize,
+    #[arg(long, value_enum, default_value = "cpu")]
+    execution_provider: RuntimeProvider,
+    #[arg(long, default_value = "4")]
+    intra_threads: usize,
+    #[arg(long, default_value_t = true, action = clap::ArgAction::Set)]
+    memory_pattern: bool,
     /// Optionally save the final image outside the measured region.
     #[arg(long)]
     output: Option<PathBuf>,
@@ -93,34 +115,40 @@ enum LoadedOperator {
 
 impl LoadedOperator {
     fn load(args: &Args, width: u32, height: u32) -> Result<Self> {
+        let runtime = runtime_options(args);
         let params = BackgroundRemovalParams {
             model_width: 1024,
             model_height: 1024,
             ..Default::default()
         };
         match args.operator {
-            OperatorKind::Upscale => Ok(Self::Upscale(ModelOperator::new(
+            OperatorKind::Upscale => Ok(Self::Upscale(ModelOperator::new_with_runtime(
                 &model_path("upscale")?,
                 UpscalingParams::default(),
+                runtime,
             )?)),
-            OperatorKind::Rembg => Ok(Self::Rembg(BackgroundRemover::new(
+            OperatorKind::Rembg => Ok(Self::Rembg(BackgroundRemover::new_with_runtime(
                 &model_path("rembg")?,
                 params,
+                runtime,
             )?)),
-            OperatorKind::RembgHigh => Ok(Self::RembgHigh(BackgroundRemover::new(
+            OperatorKind::RembgHigh => Ok(Self::RembgHigh(BackgroundRemover::new_with_runtime(
                 &model_path("rembg-hq")?,
                 params,
+                runtime,
             )?)),
-            OperatorKind::Restore => Ok(Self::Restore(ModelOperator::new(
+            OperatorKind::Restore => Ok(Self::Restore(ModelOperator::new_with_runtime(
                 &model_path("restore")?,
                 FaceRestorationParams::default(),
+                runtime,
             )?)),
             OperatorKind::Segment => {
                 let paths = model_paths("sam")?;
                 Ok(Self::Segment {
-                    operator: SegmentOperator::new(
+                    operator: SegmentOperator::new_with_runtime(
                         &paths[0].to_string_lossy(),
                         &paths[1].to_string_lossy(),
+                        runtime,
                     )?,
                     prompt: parse_relative_point(&args.point, width, height)?,
                 })
@@ -128,7 +156,7 @@ impl LoadedOperator {
             OperatorKind::Erase => {
                 let mask_path = args.mask.clone().context("--mask is required for erase")?;
                 Ok(Self::Erase {
-                    operator: EraseOperator::new(&model_path("erase")?)?,
+                    operator: EraseOperator::new_with_runtime(&model_path("erase")?, runtime)?,
                     params: EraseParams {
                         mask_path,
                         dilate: args.dilate,
@@ -138,11 +166,12 @@ impl LoadedOperator {
             OperatorKind::ClickErase => {
                 let sam = model_paths("sam")?;
                 Ok(Self::ClickErase {
-                    segment: SegmentOperator::new(
+                    segment: SegmentOperator::new_with_runtime(
                         &sam[0].to_string_lossy(),
                         &sam[1].to_string_lossy(),
+                        runtime,
                     )?,
-                    erase: EraseOperator::new(&model_path("erase")?)?,
+                    erase: EraseOperator::new_with_runtime(&model_path("erase")?, runtime)?,
                     prompt: parse_relative_point(&args.point, width, height)?,
                     dilate: args.dilate,
                 })
@@ -195,6 +224,8 @@ struct Environment {
     cpu_model: Option<String>,
     memory_bytes: Option<u64>,
     execution_provider: &'static str,
+    intra_threads: usize,
+    memory_pattern: bool,
 }
 
 #[derive(Serialize)]
@@ -298,7 +329,7 @@ fn main() -> Result<()> {
     let report = Report {
         schema_version: REPORT_SCHEMA_VERSION,
         generated_at_unix_ms: SystemTime::now().duration_since(UNIX_EPOCH)?.as_millis(),
-        environment: environment(),
+        environment: environment(&args),
         git: git_state(),
         case: CaseReport {
             operator: args.operator.as_str(),
@@ -438,7 +469,18 @@ fn sha256_file(path: &Path) -> Result<String> {
     Ok(format!("{:x}", hasher.finalize()))
 }
 
-fn environment() -> Environment {
+fn runtime_options(args: &Args) -> RuntimeOptions {
+    RuntimeOptions {
+        execution_provider: match args.execution_provider {
+            RuntimeProvider::Cpu => ExecutionProvider::Cpu,
+            RuntimeProvider::CoreMl => ExecutionProvider::CoreMl,
+        },
+        intra_threads: args.intra_threads,
+        memory_pattern: args.memory_pattern,
+    }
+}
+
+fn environment(args: &Args) -> Environment {
     Environment {
         os: std::env::consts::OS,
         arch: std::env::consts::ARCH,
@@ -447,7 +489,9 @@ fn environment() -> Environment {
             .unwrap_or(1),
         cpu_model: cpu_model(),
         memory_bytes: memory_bytes(),
-        execution_provider: "cpu",
+        execution_provider: args.execution_provider.as_str(),
+        intra_threads: args.intra_threads,
+        memory_pattern: args.memory_pattern,
     }
 }
 

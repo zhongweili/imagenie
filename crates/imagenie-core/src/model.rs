@@ -1,9 +1,10 @@
 use image::DynamicImage;
-use ort::session::{Session, builder::GraphOptimizationLevel};
+use ort::session::Session;
 use ort::value::Value;
 use std::marker::PhantomData;
 
 use crate::error::ImageProcessingError;
+use crate::runtime::{RuntimeOptions, build_session};
 use crate::tensor::{image_to_tensor, tensor_to_image};
 use crate::types::{
     BackgroundRemovalParams, FaceRestorationParams, NumericType, TensorInput, TensorOutput,
@@ -15,7 +16,10 @@ pub trait ImageModel {
     type InputType: NumericType;
     type OutputType: NumericType;
 
-    fn load_session(model_path: &str) -> Result<Session, ImageProcessingError>;
+    fn load_session(
+        model_path: &str,
+        runtime: &RuntimeOptions,
+    ) -> Result<Session, ImageProcessingError>;
     fn preprocess(
         image_path: &str,
         params: &mut Self::Params,
@@ -28,17 +32,6 @@ pub trait ImageModel {
         session: &mut Session,
         input: &TensorInput<Self::InputType>,
     ) -> Result<TensorOutput<Self::OutputType>, ImageProcessingError>;
-}
-
-pub(crate) fn build_session(model_path: &str) -> Result<Session, ImageProcessingError> {
-    Session::builder()
-        .map_err(|e| ImageProcessingError::Ort(e.to_string()))?
-        .with_optimization_level(GraphOptimizationLevel::Level3)
-        .map_err(|e| ImageProcessingError::Ort(e.to_string()))?
-        .with_intra_threads(4)
-        .map_err(|e| ImageProcessingError::Ort(e.to_string()))?
-        .commit_from_file(model_path)
-        .map_err(|e| ImageProcessingError::Ort(e.to_string()))
 }
 
 fn run_model<T>(
@@ -77,8 +70,11 @@ impl ImageModel for UpscalingModel<half::f16> {
     type InputType = half::f16;
     type OutputType = half::f16;
 
-    fn load_session(model_path: &str) -> Result<Session, ImageProcessingError> {
-        build_session(model_path)
+    fn load_session(
+        model_path: &str,
+        runtime: &RuntimeOptions,
+    ) -> Result<Session, ImageProcessingError> {
+        build_session(model_path, runtime)
     }
 
     fn preprocess(
@@ -126,8 +122,11 @@ impl ImageModel for FaceRestorationModel<f32> {
     type InputType = f32;
     type OutputType = f32;
 
-    fn load_session(model_path: &str) -> Result<Session, ImageProcessingError> {
-        build_session(model_path)
+    fn load_session(
+        model_path: &str,
+        runtime: &RuntimeOptions,
+    ) -> Result<Session, ImageProcessingError> {
+        build_session(model_path, runtime)
     }
 
     fn preprocess(
@@ -224,8 +223,11 @@ impl ImageModel for BackgroundRemovalModel<f32> {
     type InputType = f32;
     type OutputType = f32;
 
-    fn load_session(model_path: &str) -> Result<Session, ImageProcessingError> {
-        build_session(model_path)
+    fn load_session(
+        model_path: &str,
+        runtime: &RuntimeOptions,
+    ) -> Result<Session, ImageProcessingError> {
+        build_session(model_path, runtime)
     }
 
     fn preprocess(

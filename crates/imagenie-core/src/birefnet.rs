@@ -3,7 +3,8 @@ use ort::session::Session;
 use std::marker::PhantomData;
 
 use crate::error::ImageProcessingError;
-use crate::model::{ImageModel, build_session};
+use crate::model::ImageModel;
+use crate::runtime::{RuntimeOptions, build_session};
 use crate::types::{BackgroundRemovalParams, TensorInput, TensorOutput};
 
 const IMAGENET_MEAN: [f32; 3] = [0.485, 0.456, 0.406];
@@ -18,8 +19,11 @@ impl ImageModel for BiRefNetModel<f32> {
     type InputType = f32;
     type OutputType = f32;
 
-    fn load_session(model_path: &str) -> Result<Session, ImageProcessingError> {
-        build_session(model_path)
+    fn load_session(
+        model_path: &str,
+        runtime: &RuntimeOptions,
+    ) -> Result<Session, ImageProcessingError> {
+        build_session(model_path, runtime)
     }
 
     fn preprocess(

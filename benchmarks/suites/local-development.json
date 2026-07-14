@@ -18,13 +18,15 @@
       "id": "rembg-high-animal",
       "operator": "rembg-high",
       "input": "experiments/images/animal-1.jpg",
+      "memory_pattern": false,
       "warmups": 1,
-      "iterations": 2
+      "iterations": 3
     },
     {
       "id": "upscale-animal",
       "operator": "upscale",
       "input": "experiments/images/animal-1.jpg",
+      "intra_threads": 12,
       "warmups": 0,
       "iterations": 3
     },

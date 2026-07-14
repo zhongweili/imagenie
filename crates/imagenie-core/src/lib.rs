@@ -6,6 +6,7 @@ pub mod model;
 pub mod operation;
 pub mod processor;
 pub mod registry;
+pub mod runtime;
 pub mod segment;
 mod tensor;
 pub mod types;

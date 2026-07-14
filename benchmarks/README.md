@@ -54,3 +54,26 @@ the suite is a reproducible performance baseline on the current workstation but
 **is not a quality or release gate**. A quality gate may only be enabled after
 each case has a committed source, license, annotation method, and expected
 metric.
+
+## Quality fixture gate
+
+`quality/manifest.json` is the source of truth for representative quality
+fixtures. Validate provenance, per-image licensing, repository-safe paths, and
+SHA-256 values with:
+
+```sh
+python3 benchmarks/validate_quality_manifest.py
+```
+
+Release automation must add `--require-ready`. That mode intentionally fails
+until every operator reaches its minimum case count and all blockers have been
+removed.
+
+Open Images V7 is the first approved candidate source because its official
+metadata includes original landing pages, authors, and license information, and
+its annotations are CC BY 4.0. The official download documentation also warns
+that each image's license must be verified independently; therefore a dataset
+name alone is never sufficient evidence in an Imagenie fixture manifest.
+
+- Open Images description: <https://storage.googleapis.com/openimages/web/factsfigures_v7.html>
+- Image metadata and license fields: <https://storage.googleapis.com/openimages/web/download.html>

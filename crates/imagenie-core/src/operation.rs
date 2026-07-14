@@ -1,6 +1,7 @@
 use crate::ImageProcessingError;
 use crate::model::ImageModel;
 use crate::processor::ModelProcessor;
+use crate::runtime::RuntimeOptions;
 use image::DynamicImage;
 use rayon::prelude::*;
 use serde::Serialize;
@@ -80,8 +81,16 @@ where
     M: ImageModel + Send + Sync,
 {
     pub fn new(model_path: &str, params: M::Params) -> Result<Self, ImageProcessingError> {
+        Self::new_with_runtime(model_path, params, RuntimeOptions::default())
+    }
+
+    pub fn new_with_runtime(
+        model_path: &str,
+        params: M::Params,
+        runtime: RuntimeOptions,
+    ) -> Result<Self, ImageProcessingError> {
         Ok(Self {
-            processor: ModelProcessor::new(model_path)?,
+            processor: ModelProcessor::new_with_runtime(model_path, runtime)?,
             params,
         })
     }

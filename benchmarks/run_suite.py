@@ -46,9 +46,17 @@ def case_command(case: dict[str, Any]) -> list[str]:
         "--iterations",
         str(case.get("iterations", 3)),
     ]
-    for option in ("point", "mask", "dilate"):
+    for option in (
+        "point",
+        "mask",
+        "dilate",
+        "execution_provider",
+        "intra_threads",
+        "memory_pattern",
+    ):
         if option in case:
-            command.extend([f"--{option}", str(case[option])])
+            value = str(case[option]).lower() if isinstance(case[option], bool) else str(case[option])
+            command.extend([f"--{option.replace('_', '-')}", value])
     return command
 
 

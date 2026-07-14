@@ -3,7 +3,10 @@ use std::sync::OnceLock;
 use tracing::info;
 
 use crate::utils::models_dir;
-use imagenie_core::{model::UpscalingModel, types::UpscalingParams, ImageOperator, ModelOperator};
+use imagenie_core::{
+    model::UpscalingModel, runtime::RuntimeOptions, types::UpscalingParams, ImageOperator,
+    ModelOperator,
+};
 
 static UPSCALER: OnceLock<ModelOperator<UpscalingModel>> = OnceLock::new();
 
@@ -13,9 +16,10 @@ pub async fn init_upscaling() -> Result<(), String> {
     UPSCALER.get_or_init(|| {
         let model_path = models_dir.join("image_upscaling.onnx");
 
-        ModelOperator::<UpscalingModel>::new(
+        ModelOperator::<UpscalingModel>::new_with_runtime(
             model_path.to_str().unwrap(),
             UpscalingParams::default(),
+            RuntimeOptions::upscale(),
         )
         .map_err(|e| e.to_string())
         .unwrap()

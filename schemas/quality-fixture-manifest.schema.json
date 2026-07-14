@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://imagenie.dev/schemas/quality-fixture-manifest.schema.json",
+  "title": "Imagenie quality fixture manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "gate_status",
+    "gate_blockers",
+    "minimum_cases",
+    "approved_sources",
+    "cases"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "gate_status": { "enum": ["blocked", "ready"] },
+    "gate_blockers": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "minimum_cases": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rembg", "upscale", "restore", "segment", "erase", "segment_erase"],
+      "properties": {
+        "rembg": { "type": "integer", "minimum": 1 },
+        "upscale": { "type": "integer", "minimum": 1 },
+        "restore": { "type": "integer", "minimum": 1 },
+        "segment": { "type": "integer", "minimum": 1 },
+        "erase": { "type": "integer", "minimum": 1 },
+        "segment_erase": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "approved_sources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/sourcePolicy" }
+    },
+    "cases": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/case" }
+    }
+  },
+  "$defs": {
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "url"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri", "pattern": "^https://" }
+      }
+    },
+    "sourcePolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "homepage",
+        "annotation_license",
+        "expected_image_license",
+        "per_asset_verification_required"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$" },
+        "homepage": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "annotation_license": { "$ref": "#/$defs/license" },
+        "expected_image_license": { "$ref": "#/$defs/license" },
+        "per_asset_verification_required": { "const": true }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "derivation": { "type": "string", "minLength": 1 },
+        "annotation_method": { "type": "string", "minLength": 1 }
+      }
+    },
+    "referenceAsset": {
+      "allOf": [
+        { "$ref": "#/$defs/asset" },
+        { "required": ["annotation_method"] }
+      ]
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "operator", "source", "input", "reference", "metrics"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$" },
+        "operator": {
+          "enum": ["rembg", "upscale", "restore", "segment", "erase", "segment_erase"]
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["dataset_id", "image_id", "landing_url", "author", "license"],
+          "properties": {
+            "dataset_id": { "type": "string", "minLength": 1 },
+            "image_id": { "type": "string", "minLength": 1 },
+            "landing_url": { "type": "string", "format": "uri", "pattern": "^https://" },
+            "author": { "type": "string", "minLength": 1 },
+            "license": { "$ref": "#/$defs/license" }
+          }
+        },
+        "input": { "$ref": "#/$defs/asset" },
+        "reference": { "$ref": "#/$defs/referenceAsset" },
+        "metrics": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "prompt": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["x", "y"],
+          "properties": {
+            "x": { "type": "number", "minimum": 0, "maximum": 1 },
+            "y": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    }
+  }
+}

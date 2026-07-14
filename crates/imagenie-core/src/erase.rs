@@ -6,8 +6,8 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 
 use crate::error::ImageProcessingError;
-use crate::model::build_session;
 use crate::operation::{ParameterizedImageOperator, ProcessOutput};
+use crate::runtime::{RuntimeOptions, build_session};
 use crate::segment::dilate_mask;
 
 pub const LAMA_SIZE: usize = 512;
@@ -33,8 +33,15 @@ pub struct EraseOperator {
 
 impl EraseOperator {
     pub fn new(model_path: &str) -> Result<Self, ImageProcessingError> {
+        Self::new_with_runtime(model_path, RuntimeOptions::default())
+    }
+
+    pub fn new_with_runtime(
+        model_path: &str,
+        runtime: RuntimeOptions,
+    ) -> Result<Self, ImageProcessingError> {
         Ok(Self {
-            eraser: Mutex::new(Eraser::new(model_path)?),
+            eraser: Mutex::new(Eraser::new_with_runtime(model_path, runtime)?),
         })
     }
 
@@ -70,8 +77,15 @@ impl ParameterizedImageOperator<EraseParams> for EraseOperator {
 
 impl Eraser {
     pub fn new(model_path: &str) -> Result<Self, ImageProcessingError> {
+        Self::new_with_runtime(model_path, RuntimeOptions::default())
+    }
+
+    pub fn new_with_runtime(
+        model_path: &str,
+        runtime: RuntimeOptions,
+    ) -> Result<Self, ImageProcessingError> {
         Ok(Self {
-            session: build_session(model_path)?,
+            session: build_session(model_path, &runtime)?,
         })
     }
 

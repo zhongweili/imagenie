@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "gate_status": "blocked",
+  "gate_blockers": [
+    "Select and pin individual assets with verified per-image licenses.",
+    "Create task-specific references and record their annotation methods.",
+    "Reach the minimum representative case counts before enabling the gate."
+  ],
+  "minimum_cases": {
+    "rembg": 10,
+    "upscale": 10,
+    "restore": 10,
+    "segment": 20,
+    "erase": 10,
+    "segment_erase": 20
+  },
+  "approved_sources": [
+    {
+      "id": "open-images-v7",
+      "homepage": "https://storage.googleapis.com/openimages/web/index.html",
+      "annotation_license": {
+        "name": "CC-BY-4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      "expected_image_license": {
+        "name": "CC-BY-2.0",
+        "url": "https://creativecommons.org/licenses/by/2.0/"
+      },
+      "per_asset_verification_required": true
+    }
+  ],
+  "cases": []
+}

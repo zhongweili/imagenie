@@ -11,6 +11,7 @@ use imagenie_core::birefnet::BiRefNetModel;
 use imagenie_core::erase::EraseOperator;
 use imagenie_core::model::{BackgroundRemovalModel, FaceRestorationModel, UpscalingModel};
 use imagenie_core::registry;
+use imagenie_core::runtime::RuntimeOptions;
 use imagenie_core::segment::{Prompt, SegmentOperator};
 use imagenie_core::types::{BackgroundRemovalParams, FaceRestorationParams, UpscalingParams};
 use imagenie_core::{ImageOperator, ModelOperator, ProcessOutput};
@@ -321,9 +322,10 @@ pub fn upscale(inputs: Vec<String>, format: OutputFormat, common: &CommonArgs) -
         }
         return code;
     }
-    let processor = match ModelOperator::<UpscalingModel>::new(
+    let processor = match ModelOperator::<UpscalingModel>::new_with_runtime(
         &model_path("upscale"),
         UpscalingParams::default(),
+        RuntimeOptions::upscale(),
     ) {
         Ok(p) => p,
         Err(e) => {
@@ -472,7 +474,12 @@ pub fn rembg(
         RembgQuality::Fast => {
             BackgroundRemover::new(&model_path(model_name), params.clone()).map(P::Fast)
         }
-        RembgQuality::High => BackgroundRemover::new(&model_path(model_name), params).map(P::High),
+        RembgQuality::High => BackgroundRemover::new_with_runtime(
+            &model_path(model_name),
+            params,
+            RuntimeOptions::rembg_high(),
+        )
+        .map(P::High),
     };
     let processor = match processor {
         Ok(p) => p,

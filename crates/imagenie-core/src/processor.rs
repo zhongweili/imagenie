@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 use std::sync::Mutex;
 
 use super::{ImageModel, ImageProcessingError};
+use crate::runtime::RuntimeOptions;
 
 pub struct ModelProcessor<M: ImageModel + Send + Sync> {
     // ort 2.0 requires `&mut Session` to run; inference is serialized here while
@@ -13,7 +14,14 @@ pub struct ModelProcessor<M: ImageModel + Send + Sync> {
 
 impl<M: ImageModel + Send + Sync> ModelProcessor<M> {
     pub fn new(model_path: &str) -> Result<Self, ImageProcessingError> {
-        let session = M::load_session(model_path)?;
+        Self::new_with_runtime(model_path, RuntimeOptions::default())
+    }
+
+    pub fn new_with_runtime(
+        model_path: &str,
+        runtime: RuntimeOptions,
+    ) -> Result<Self, ImageProcessingError> {
+        let session = M::load_session(model_path, &runtime)?;
         Ok(Self {
             session: Mutex::new(session),
             _phantom: PhantomData,
