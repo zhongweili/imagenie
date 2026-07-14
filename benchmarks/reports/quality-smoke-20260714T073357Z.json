@@ -1,0 +1,108 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-07-14T07:33:57+00:00",
+  "gate_status": "blocked",
+  "cases": [
+    {
+      "fixture": {
+        "id": "open-images-boy-114d6b81-segment",
+        "operator": "segment",
+        "source": {
+          "dataset_id": "open-images-v5",
+          "image_id": "114d6b81e7b1fa08",
+          "landing_url": "https://www.flickr.com/photos/battlecreekcvb/5390777685",
+          "author": "Battle Creek CVB",
+          "license": {
+            "name": "CC-BY-2.0",
+            "url": "https://creativecommons.org/licenses/by/2.0/"
+          }
+        },
+        "input": {
+          "path": "benchmarks/quality/assets/open-images-v5/114d6b81e7b1fa08.jpg",
+          "sha256": "c8ea322fa64799de2e323c041997cb41de42c80f129b9ca735c410451e04b4aa"
+        },
+        "reference": {
+          "path": "benchmarks/quality/assets/open-images-v5/114d6b81e7b1fa08_m01bl7v_b62eb236.png",
+          "sha256": "fe870ec5a5c9d9cc9bd55af13040b9135f8c6d7b21f50bf83c0ad798e1eaf5a3",
+          "annotation_method": "Open Images V5 manually annotated validation instance mask; Prompt was manually verified inside the lower torso of the annotated boy instance."
+        },
+        "metrics": [
+          "prompt_iou",
+          "success_rate"
+        ],
+        "prompt": {
+          "x": 0.15,
+          "y": 0.6
+        }
+      },
+      "report": {
+        "schema_version": "1.0",
+        "generated_at_unix_ms": 1784014437409,
+        "environment": {
+          "os": "macos",
+          "arch": "aarch64",
+          "logical_cpus": 16,
+          "cpu_model": "Apple M3 Max",
+          "memory_bytes": 68719476736,
+          "execution_provider": "cpu",
+          "intra_threads": 4,
+          "memory_pattern": true
+        },
+        "git": {
+          "commit": "f78e46bc355f75a3933c87b9ef7fe00bf64a1824",
+          "dirty": false
+        },
+        "case": {
+          "operator": "segment",
+          "input": "benchmarks/quality/assets/open-images-v5/114d6b81e7b1fa08.jpg",
+          "input_sha256": "c8ea322fa64799de2e323c041997cb41de42c80f129b9ca735c410451e04b4aa",
+          "input_width": 1024,
+          "input_height": 1024,
+          "point": "0.15,0.6",
+          "mask": null,
+          "reference": "benchmarks/quality/assets/open-images-v5/114d6b81e7b1fa08_m01bl7v_b62eb236.png",
+          "reference_sha256": "fe870ec5a5c9d9cc9bd55af13040b9135f8c6d7b21f50bf83c0ad798e1eaf5a3",
+          "dilate": null,
+          "models": [
+            {
+              "name": "sam",
+              "artifact_sha256": "c602cb3f6fd297312a415f885f0df3f0eef9fbb334b069c9d30e828f2ae7c69a",
+              "size_bytes": 116507723
+            }
+          ]
+        },
+        "measurements": {
+          "model_load_ms": 556.631416,
+          "cold_ms": 991.647958,
+          "warmups": 0,
+          "warm_iterations": 1,
+          "warm_ms": [
+            30.152958
+          ],
+          "warm_stats": {
+            "min_ms": 30.152958,
+            "mean_ms": 30.152958,
+            "p50_ms": 30.152958,
+            "p95_ms": 30.152958,
+            "max_ms": 30.152958
+          },
+          "peak_rss_bytes": 1812234240
+        },
+        "result": {
+          "output_width": 1024,
+          "output_height": 1024,
+          "metrics": {
+            "iou": 0.76997495,
+            "mask_pixels": 4393
+          },
+          "warnings": [],
+          "saved_to": null,
+          "quality_status": "evaluated",
+          "quality_metrics": {
+            "iou": 0.46884501041533244
+          }
+        }
+      }
+    }
+  ]
+}
