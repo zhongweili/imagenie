@@ -141,7 +141,7 @@ def main() -> int:
         "dataset": suite["dataset"],
         "cases": case_reports,
     }
-    timestamp = generated_at.replace(":", "").replace("+00:00", "Z").replace("-", "")
+    timestamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     prefix = args.output_prefix or ROOT / "benchmarks" / "reports" / f"{suite['id']}-{timestamp}"
     prefix.parent.mkdir(parents=True, exist_ok=True)
     json_path = prefix.with_suffix(".json")

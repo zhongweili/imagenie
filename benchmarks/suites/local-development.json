@@ -26,14 +26,14 @@
       "operator": "upscale",
       "input": "experiments/images/animal-1.jpg",
       "warmups": 0,
-      "iterations": 1
+      "iterations": 3
     },
     {
       "id": "restore-face",
       "operator": "restore",
       "input": "experiments/images/girl-1.jpg",
       "warmups": 0,
-      "iterations": 1
+      "iterations": 3
     },
     {
       "id": "segment-animal",
@@ -50,7 +50,7 @@
       "point": "0.8,0.5",
       "dilate": 12,
       "warmups": 0,
-      "iterations": 1
+      "iterations": 3
     }
   ]
 }
