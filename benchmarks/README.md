@@ -32,3 +32,25 @@ total latency.
 
 Real datasets and redistribute-restricted images must not be committed without
 an explicit license record.
+
+## Running the local performance baseline
+
+The benchmark binary runs one operator in an isolated process and records model
+load time, cold latency, warm samples, peak RSS, environment details, the git
+revision, input SHA-256, and model artifact SHA-256. The suite runner builds the
+release binary once and aggregates the case reports:
+
+```sh
+python3 benchmarks/run_suite.py benchmarks/suites/local-development.json
+```
+
+Reports are written to `benchmarks/reports/` as JSON and Markdown. Pass
+`--output-prefix /path/to/name` to choose another location, or `--skip-build`
+when the release binary is already current.
+
+`local-development.json` intentionally references gitignored images under
+`experiments/images/`. Those inputs have no recorded redistribution license, so
+the suite is a reproducible performance baseline on the current workstation but
+**is not a quality or release gate**. A quality gate may only be enabled after
+each case has a committed source, license, annotation method, and expected
+metric.

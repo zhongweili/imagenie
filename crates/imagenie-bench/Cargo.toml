@@ -1,0 +1,24 @@
+[package]
+name = "imagenie-bench"
+version = "0.1.0"
+description = "Reproducible performance benchmark runner for Imagenie"
+authors = ["zhongwei"]
+edition = "2024"
+license = "MIT"
+publish = false
+
+[[bin]]
+name = "imagenie-bench"
+path = "src/main.rs"
+
+[dependencies]
+imagenie-core = { workspace = true }
+anyhow = { workspace = true }
+clap = { version = "4", features = ["derive"] }
+image = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"

@@ -1,5 +1,7 @@
 {
   "schema_version": "1.0",
+  "quality_gate_status": "blocked_pending_licensed_dataset",
+  "performance_suites": ["suites/local-development.json"],
   "reference_environments": [
     {
       "id": "macos-apple-silicon",

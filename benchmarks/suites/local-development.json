@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "local-development",
+  "description": "Local performance smoke suite; inputs are gitignored and not licensed as release fixtures.",
+  "dataset": {
+    "status": "local_only_unverified_license",
+    "quality_gate": false
+  },
+  "cases": [
+    {
+      "id": "rembg-fast-animal",
+      "operator": "rembg",
+      "input": "experiments/images/animal-1.jpg",
+      "warmups": 1,
+      "iterations": 3
+    },
+    {
+      "id": "rembg-high-animal",
+      "operator": "rembg-high",
+      "input": "experiments/images/animal-1.jpg",
+      "warmups": 1,
+      "iterations": 2
+    },
+    {
+      "id": "upscale-animal",
+      "operator": "upscale",
+      "input": "experiments/images/animal-1.jpg",
+      "warmups": 0,
+      "iterations": 1
+    },
+    {
+      "id": "restore-face",
+      "operator": "restore",
+      "input": "experiments/images/girl-1.jpg",
+      "warmups": 0,
+      "iterations": 1
+    },
+    {
+      "id": "segment-animal",
+      "operator": "segment",
+      "input": "experiments/images/animal-1.jpg",
+      "point": "0.8,0.5",
+      "warmups": 1,
+      "iterations": 3
+    },
+    {
+      "id": "click-erase-animal",
+      "operator": "click-erase",
+      "input": "experiments/images/animal-1.jpg",
+      "point": "0.8,0.5",
+      "dilate": 12,
+      "warmups": 0,
+      "iterations": 1
+    }
+  ]
+}

@@ -2420,6 +2420,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "imagenie-bench"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "image",
+ "imagenie-core",
+ "libc",
+ "serde",
+ "serde_json",
+ "sha2",
+]
+
+[[package]]
 name = "imagenie-cli"
 version = "0.1.0"
 dependencies = [
