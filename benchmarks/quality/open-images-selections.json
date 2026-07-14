@@ -6,9 +6,9 @@
       "operator": "segment",
       "image_id": "114d6b81e7b1fa08",
       "mask_path": "114d6b81e7b1fa08_m01bl7v_b62eb236.png",
-      "prompt": { "x": 0.25, "y": 0.5 },
+      "prompt": { "x": 0.15, "y": 0.6 },
       "metrics": ["prompt_iou", "success_rate"],
-      "review": "Prompt was manually verified inside the annotated boy instance."
+      "review": "Prompt was manually verified inside the lower torso of the annotated boy instance."
     }
   ]
 }
