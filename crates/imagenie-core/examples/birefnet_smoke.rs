@@ -1,5 +1,6 @@
+use imagenie_core::ImageOperator;
+use imagenie_core::background::BackgroundRemover;
 use imagenie_core::birefnet::BiRefNetModel;
-use imagenie_core::processor::ModelProcessor;
 use imagenie_core::types::BackgroundRemovalParams;
 use std::time::Instant;
 
@@ -11,21 +12,21 @@ fn main() {
     std::fs::create_dir_all(&out_dir).unwrap();
 
     let t = Instant::now();
-    let processor = ModelProcessor::<BiRefNetModel>::new(
+    let processor = BackgroundRemover::<BiRefNetModel>::new(
         "experiments/models/candidates/birefnet-general-lite.onnx",
+        BackgroundRemovalParams {
+            model_width: 1024,
+            model_height: 1024,
+            ..Default::default()
+        },
     )
     .unwrap();
     println!("loaded in {:?}", t.elapsed());
 
-    let params = BackgroundRemovalParams {
-        model_width: 1024,
-        model_height: 1024,
-        ..Default::default()
-    };
     let t = Instant::now();
-    let mask = processor.process_single(&input, &params).unwrap();
+    let removed = processor.process(&input).unwrap().image;
     println!("inference in {:?}", t.elapsed());
 
-    mask.save(out_dir.join("mask.png")).unwrap();
-    println!("mask saved to {}", out_dir.display());
+    removed.save(out_dir.join("removed.png")).unwrap();
+    println!("output saved to {}", out_dir.display());
 }

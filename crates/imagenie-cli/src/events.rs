@@ -1,3 +1,4 @@
+use imagenie_core::ProcessMetrics;
 use imagenie_core::registry::ModelSpec;
 use serde::Serialize;
 use std::io::Write;
@@ -57,14 +58,6 @@ impl From<&ModelSpec> for ModelIdentity {
     }
 }
 
-#[derive(Clone, Copy, Debug, Default, Serialize)]
-pub struct Metrics {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub iou: Option<f32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub mask_pixels: Option<u64>,
-}
-
 #[derive(Debug, Serialize)]
 pub struct ErrorDetails<'a> {
     pub code: &'a str,
@@ -84,8 +77,8 @@ pub enum Event<'a> {
         input: &'a str,
         output: &'a str,
         duration_ms: u128,
-        metrics: Metrics,
-        warnings: &'a [&'a str],
+        metrics: ProcessMetrics,
+        warnings: &'a [String],
     },
     Skipped {
         input_index: usize,
@@ -254,7 +247,7 @@ mod tests {
             input: "in.png",
             output: "out.png",
             duration_ms: 12,
-            metrics: Metrics::default(),
+            metrics: ProcessMetrics::default(),
             warnings: &[],
         };
         let value: serde_json::Value =

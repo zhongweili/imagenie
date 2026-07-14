@@ -11,7 +11,7 @@ use crate::types::{
 };
 
 pub trait ImageModel {
-    type Params: Sync + Clone;
+    type Params: Send + Sync + Clone;
     type InputType: NumericType;
     type OutputType: NumericType;
 

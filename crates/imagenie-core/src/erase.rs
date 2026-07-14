@@ -2,9 +2,13 @@ use image::DynamicImage;
 use ndarray::Array4;
 use ort::session::Session;
 use ort::value::Value;
+use std::path::PathBuf;
+use std::sync::Mutex;
 
 use crate::error::ImageProcessingError;
 use crate::model::build_session;
+use crate::operation::{ParameterizedImageOperator, ProcessOutput};
+use crate::segment::dilate_mask;
 
 pub const LAMA_SIZE: usize = 512;
 
@@ -14,6 +18,54 @@ pub const LAMA_SIZE: usize = 512;
 /// future improvement for very large images).
 pub struct Eraser {
     session: Session,
+}
+
+#[derive(Clone, Debug)]
+pub struct EraseParams {
+    pub mask_path: PathBuf,
+    pub dilate: u32,
+}
+
+/// Agent-facing erase operator that reuses the LaMa session across requests.
+pub struct EraseOperator {
+    eraser: Mutex<Eraser>,
+}
+
+impl EraseOperator {
+    pub fn new(model_path: &str) -> Result<Self, ImageProcessingError> {
+        Ok(Self {
+            eraser: Mutex::new(Eraser::new(model_path)?),
+        })
+    }
+
+    pub fn process_image(
+        &self,
+        image: &DynamicImage,
+        mask: &image::GrayImage,
+        dilate: u32,
+    ) -> Result<ProcessOutput, ImageProcessingError> {
+        let mask = if dilate > 0 {
+            dilate_mask(mask, dilate)
+        } else {
+            mask.clone()
+        };
+        let mut eraser = self.eraser.lock().map_err(|_| {
+            ImageProcessingError::Processing("erase operator lock poisoned".to_string())
+        })?;
+        eraser.erase(image, &mask).map(ProcessOutput::image)
+    }
+}
+
+impl ParameterizedImageOperator<EraseParams> for EraseOperator {
+    fn process_with(
+        &self,
+        input_path: &str,
+        params: &EraseParams,
+    ) -> Result<ProcessOutput, ImageProcessingError> {
+        let image = image::open(input_path)?;
+        let mask = image::open(&params.mask_path)?.to_luma8();
+        self.process_image(&image, &mask, params.dilate)
+    }
 }
 
 impl Eraser {

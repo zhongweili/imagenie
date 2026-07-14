@@ -4,44 +4,38 @@ use tracing::info;
 
 use crate::utils::models_dir;
 use imagenie_core::{
-    model::FaceRestorationModel, processor::ModelProcessor, types::FaceRestorationParams,
+    model::FaceRestorationModel, types::FaceRestorationParams, ImageOperator, ModelOperator,
 };
 
-static FACE_RESTORATION_PROCESSOR: OnceLock<ModelProcessor<FaceRestorationModel>> = OnceLock::new();
+static FACE_RESTORER: OnceLock<ModelOperator<FaceRestorationModel>> = OnceLock::new();
 
 #[tauri::command]
 pub async fn init_face_restoration() -> Result<(), String> {
     let models_dir = models_dir();
-    FACE_RESTORATION_PROCESSOR.get_or_init(|| {
+    FACE_RESTORER.get_or_init(|| {
         let model_path = models_dir.join("face_restoration.onnx");
 
-        ModelProcessor::<FaceRestorationModel>::new(model_path.to_str().unwrap())
-            .map_err(|e| e.to_string())
-            .unwrap()
+        ModelOperator::<FaceRestorationModel>::new(
+            model_path.to_str().unwrap(),
+            FaceRestorationParams::default(),
+        )
+        .map_err(|e| e.to_string())
+        .unwrap()
     });
     Ok(())
 }
 
-fn get_face_restoration_processor() -> &'static ModelProcessor<FaceRestorationModel> {
-    FACE_RESTORATION_PROCESSOR.get().unwrap()
+fn get_face_restorer() -> &'static ModelOperator<FaceRestorationModel> {
+    FACE_RESTORER.get().unwrap()
 }
 
 #[tauri::command]
 pub async fn face_restoration(input_path: &str, output_dir: &str) -> Result<String, String> {
     info!("face_restoration was called with path: {}", input_path);
 
-    let processor = get_face_restoration_processor();
-    let params = FaceRestorationParams {
-        model_width: 512,
-        model_height: 512,
-        original_width: None,
-        original_height: None,
-        scaling_factor: None,
-    };
-
-    // Process image through the model
-    let restored = processor
-        .process_single(input_path, &params)
+    let restored = get_face_restorer()
+        .process(input_path)
+        .map(|output| output.image)
         .map_err(|e| e.to_string())?;
 
     // Save the result

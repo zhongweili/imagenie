@@ -2,9 +2,12 @@ use image::DynamicImage;
 use ndarray::{Array1, Array3, Array4};
 use ort::session::Session;
 use ort::value::Value;
+use std::sync::Mutex;
+use std::time::SystemTime;
 
 use crate::error::ImageProcessingError;
 use crate::model::build_session;
+use crate::operation::{ParameterizedImageOperator, ProcessMetrics, ProcessOutput};
 
 pub const SAM_SIZE: usize = 1024;
 
@@ -43,6 +46,84 @@ pub struct SegmentResult {
 pub enum Prompt {
     Point { x: f32, y: f32 },
     Box { x1: f32, y1: f32, x2: f32, y2: f32 },
+}
+
+#[derive(Debug, PartialEq, Eq)]
+struct SourceKey {
+    path: String,
+    len: u64,
+    modified: Option<SystemTime>,
+}
+
+impl SourceKey {
+    fn read(path: &str) -> Result<Self, ImageProcessingError> {
+        let metadata = std::fs::metadata(path)?;
+        Ok(Self {
+            path: path.to_string(),
+            len: metadata.len(),
+            modified: metadata.modified().ok(),
+        })
+    }
+}
+
+struct SegmentState {
+    segmenter: Segmenter,
+    source: Option<SourceKey>,
+}
+
+/// Agent-facing segmentation operator that reuses model sessions and caches an
+/// embedding while the input path, size, and modification time remain stable.
+pub struct SegmentOperator {
+    state: Mutex<SegmentState>,
+}
+
+impl SegmentOperator {
+    pub fn new(encoder_path: &str, decoder_path: &str) -> Result<Self, ImageProcessingError> {
+        Ok(Self {
+            state: Mutex::new(SegmentState {
+                segmenter: Segmenter::new(encoder_path, decoder_path)?,
+                source: None,
+            }),
+        })
+    }
+
+    pub fn process_image(
+        &self,
+        input_path: &str,
+        image: &DynamicImage,
+        prompt: Prompt,
+    ) -> Result<ProcessOutput, ImageProcessingError> {
+        let source = SourceKey::read(input_path)?;
+        let mut state = self.state.lock().map_err(|_| {
+            ImageProcessingError::Processing("segment operator lock poisoned".to_string())
+        })?;
+
+        if state.source.as_ref() != Some(&source) {
+            state.segmenter.encode(image)?;
+            state.source = Some(source);
+        }
+        let result = state.segmenter.decode(prompt)?;
+
+        Ok(ProcessOutput {
+            image: DynamicImage::ImageLuma8(result.mask),
+            metrics: ProcessMetrics {
+                iou: Some(result.iou),
+                mask_pixels: Some(result.mask_pixels),
+            },
+            warnings: Vec::new(),
+        })
+    }
+}
+
+impl ParameterizedImageOperator<Prompt> for SegmentOperator {
+    fn process_with(
+        &self,
+        input_path: &str,
+        prompt: &Prompt,
+    ) -> Result<ProcessOutput, ImageProcessingError> {
+        let image = image::open(input_path)?;
+        self.process_image(input_path, &image, *prompt)
+    }
 }
 
 impl Segmenter {

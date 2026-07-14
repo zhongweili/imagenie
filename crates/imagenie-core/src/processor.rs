@@ -1,5 +1,4 @@
 use image::DynamicImage;
-use rayon::prelude::*;
 use std::marker::PhantomData;
 use std::sync::Mutex;
 
@@ -33,19 +32,5 @@ impl<M: ImageModel + Send + Sync> ModelProcessor<M> {
             M::process(&mut session, &input)?
         };
         M::postprocess(&output, &params)
-    }
-
-    pub fn process_batch<I>(
-        &self,
-        image_paths: I,
-        params: &M::Params,
-    ) -> Result<Vec<DynamicImage>, ImageProcessingError>
-    where
-        I: IntoParallelIterator<Item = String>,
-    {
-        image_paths
-            .into_par_iter()
-            .map(|path| self.process_single(&path, params))
-            .collect()
     }
 }

@@ -3,36 +3,37 @@ use std::sync::OnceLock;
 use tracing::info;
 
 use crate::utils::models_dir;
-use imagenie_core::{model::UpscalingModel, processor::ModelProcessor, types::UpscalingParams};
+use imagenie_core::{model::UpscalingModel, types::UpscalingParams, ImageOperator, ModelOperator};
 
-static UPSCALE_PROCESSOR: OnceLock<ModelProcessor<UpscalingModel>> = OnceLock::new();
+static UPSCALER: OnceLock<ModelOperator<UpscalingModel>> = OnceLock::new();
 
 #[tauri::command]
 pub async fn init_upscaling() -> Result<(), String> {
     let models_dir = models_dir();
-    UPSCALE_PROCESSOR.get_or_init(|| {
+    UPSCALER.get_or_init(|| {
         let model_path = models_dir.join("image_upscaling.onnx");
 
-        ModelProcessor::<UpscalingModel>::new(model_path.to_str().unwrap())
-            .map_err(|e| e.to_string())
-            .unwrap()
+        ModelOperator::<UpscalingModel>::new(
+            model_path.to_str().unwrap(),
+            UpscalingParams::default(),
+        )
+        .map_err(|e| e.to_string())
+        .unwrap()
     });
     Ok(())
 }
 
-fn get_upscale_processor() -> &'static ModelProcessor<UpscalingModel> {
-    UPSCALE_PROCESSOR.get().unwrap()
+fn get_upscaler() -> &'static ModelOperator<UpscalingModel> {
+    UPSCALER.get().unwrap()
 }
 
 #[tauri::command]
 pub async fn upscale_image(input_path: &str, output_dir: &str) -> Result<String, String> {
     info!("upscale_image was called with path: {}", input_path);
 
-    let processor = get_upscale_processor();
-    let params = UpscalingParams {};
-
-    let image = processor
-        .process_single(input_path, &params)
+    let image = get_upscaler()
+        .process(input_path)
+        .map(|output| output.image)
         .map_err(|e| e.to_string())?;
 
     let name = Path::new(input_path)
@@ -58,15 +59,11 @@ pub async fn upscale_images(input_paths: Vec<String>, output_dir: &str) -> Resul
         input_paths.len()
     );
 
-    let processor = get_upscale_processor();
-    let params = UpscalingParams {};
-
     let paths_clone = input_paths.clone();
-    let images = processor
-        .process_batch(input_paths, &params)
-        .map_err(|e| e.to_string())?;
+    let outputs = get_upscaler().process_batch(&input_paths);
 
-    for (i, image) in images.iter().enumerate() {
+    for (i, output) in outputs.into_iter().enumerate() {
+        let image = output.map_err(|e| e.to_string())?.image;
         let name = Path::new(&paths_clone[i])
             .file_name()
             .unwrap()

@@ -1,5 +1,6 @@
-use imagenie_core::erase::Eraser;
-use imagenie_core::segment::{Prompt, Segmenter, dilate_mask};
+use imagenie_core::erase::EraseOperator;
+use imagenie_core::registry;
+use imagenie_core::segment::{Prompt, SegmentOperator};
 use std::time::Instant;
 
 fn main() {
@@ -9,45 +10,47 @@ fn main() {
     let (px, py) = coords.split_once(',').expect("bad coords");
     let (px, py): (f32, f32) = (px.parse().unwrap(), py.parse().unwrap());
 
-    let models = "experiments/models/candidates";
     let image = image::open(input).unwrap();
     let out_dir = std::env::temp_dir().join("imagenie-click-erase");
     std::fs::create_dir_all(&out_dir).unwrap();
 
+    let sam = registry::find("sam").unwrap();
+    let sam_paths = registry::model_paths(sam);
     let t = Instant::now();
-    let mut seg = Segmenter::new(
-        &format!("{models}/sam2.1_tiny/sam2.1_hiera_tiny.encoder.onnx"),
-        &format!("{models}/sam2.1_tiny/sam2.1_hiera_tiny.decoder.onnx"),
+    let segment = SegmentOperator::new(
+        &sam_paths[0].to_string_lossy(),
+        &sam_paths[1].to_string_lossy(),
     )
     .unwrap();
     println!("SAM sessions loaded in {:?}", t.elapsed());
 
+    let prompt = Prompt::Point {
+        x: px * image.width() as f32,
+        y: py * image.height() as f32,
+    };
     let t = Instant::now();
-    seg.encode(&image).unwrap();
-    println!("encode: {:?}", t.elapsed());
-
-    let t = Instant::now();
-    let result = seg
-        .decode(Prompt::Point {
-            x: px * image.width() as f32,
-            y: py * image.height() as f32,
-        })
-        .unwrap();
+    let segmented = segment.process_image(input, &image, prompt).unwrap();
     println!(
-        "decode: {:?}, iou {:.3}, mask px {}",
+        "segment: {:?}, iou {:.3}, mask px {}",
         t.elapsed(),
-        result.iou,
-        result.mask_pixels
+        segmented.metrics.iou.unwrap(),
+        segmented.metrics.mask_pixels.unwrap()
     );
-    result.mask.save(out_dir.join("mask.png")).unwrap();
-
     let t = Instant::now();
-    let dilated = dilate_mask(&result.mask, 12 * image.width().max(image.height()) / 512);
-    println!("dilate: {:?}", t.elapsed());
+    let cached = segment.process_image(input, &image, prompt).unwrap();
+    assert_eq!(cached.metrics, segmented.metrics);
+    assert_eq!(cached.image.to_luma8(), segmented.image.to_luma8());
+    println!("cached decode: {:?}", t.elapsed());
 
+    let mask = segmented.image.to_luma8();
+    mask.save(out_dir.join("mask.png")).unwrap();
+
+    let erase = registry::find("erase").unwrap();
+    let erase_path = registry::model_paths(erase);
     let t = Instant::now();
-    let mut eraser = Eraser::new(&format!("{models}/lama_fp32.onnx")).unwrap();
-    let erased = eraser.erase(&image, &dilated).unwrap();
+    let eraser = EraseOperator::new(&erase_path[0].to_string_lossy()).unwrap();
+    let dilate = 12 * image.width().max(image.height()) / 512;
+    let erased = eraser.process_image(&image, &mask, dilate).unwrap().image;
     println!("erase: {:?}", t.elapsed());
 
     erased.save(out_dir.join("erased.png")).unwrap();

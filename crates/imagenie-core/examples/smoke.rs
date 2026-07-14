@@ -1,3 +1,5 @@
+use imagenie_core::ImageOperator;
+use imagenie_core::background::BackgroundRemover;
 use imagenie_core::model::{BackgroundRemovalModel, FaceRestorationModel, UpscalingModel};
 use imagenie_core::processor::ModelProcessor;
 use imagenie_core::registry;
@@ -27,21 +29,21 @@ fn main() {
     );
 
     let t = Instant::now();
-    let rembg = ModelProcessor::<BackgroundRemovalModel>::new(
+    let rembg = BackgroundRemover::<BackgroundRemovalModel>::new(
         models.join("background_removal.onnx").to_str().unwrap(),
+        BackgroundRemovalParams {
+            model_width: 1024,
+            model_height: 1024,
+            ..Default::default()
+        },
     )
     .unwrap();
-    let params = BackgroundRemovalParams {
-        model_width: 1024,
-        model_height: 1024,
-        ..Default::default()
-    };
-    let mask = rembg.process_single(&input, &params).unwrap();
-    mask.save(out_dir.join("mask.png")).unwrap();
+    let removed = rembg.process(&input).unwrap().image;
+    removed.save(out_dir.join("removed.png")).unwrap();
     println!(
         "rembg OK ({}x{}) in {:?}",
-        mask.width(),
-        mask.height(),
+        removed.width(),
+        removed.height(),
         t.elapsed()
     );
 

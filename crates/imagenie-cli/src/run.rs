@@ -1,4 +1,4 @@
-use crate::events::{Emitter, Event, Metrics, codes};
+use crate::events::{Emitter, Event, codes};
 use crate::models::ensure;
 use crate::output::{Collision, check_collision, prepare_output_dir, resolve};
 use crate::{
@@ -6,13 +6,14 @@ use crate::{
     OutputFormat, RembgQuality,
 };
 use image::DynamicImage;
+use imagenie_core::background::BackgroundRemover;
 use imagenie_core::birefnet::BiRefNetModel;
-use imagenie_core::erase::Eraser;
+use imagenie_core::erase::EraseOperator;
 use imagenie_core::model::{BackgroundRemovalModel, FaceRestorationModel, UpscalingModel};
-use imagenie_core::processor::ModelProcessor;
 use imagenie_core::registry;
-use imagenie_core::segment::{Prompt, Segmenter, dilate_mask};
+use imagenie_core::segment::{Prompt, SegmentOperator};
 use imagenie_core::types::{BackgroundRemovalParams, FaceRestorationParams, UpscalingParams};
+use imagenie_core::{ImageOperator, ModelOperator, ProcessOutput};
 use rayon::prelude::*;
 use std::io::{Read, Write};
 use std::path::Path;
@@ -134,7 +135,7 @@ fn run_batch<F>(
     process: F,
 ) -> u8
 where
-    F: Fn(&str) -> Result<DynamicImage, String> + Sync,
+    F: Fn(&str) -> Result<ProcessOutput, String> + Sync,
 {
     let batch_started = Instant::now();
     let multi = inputs.len() > 1;
@@ -181,15 +182,15 @@ where
 
                 if input == "-" {
                     match process("-") {
-                        Ok(_) => {
+                        Ok(output) => {
                             succeeded.fetch_add(1, Ordering::Relaxed);
                             emitter.emit(&Event::Done {
                                 input_index,
                                 input,
                                 output: "-",
                                 duration_ms: t.elapsed().as_millis(),
-                                metrics: Metrics::default(),
-                                warnings: &[],
+                                metrics: output.metrics,
+                                warnings: &output.warnings,
                             });
                         }
                         Err(msg) => {
@@ -234,13 +235,13 @@ where
                 }
 
                 match process(input) {
-                    Ok(img) => {
+                    Ok(output) => {
                         let format = match ext {
                             "jpg" => OutputFormat::Jpeg,
                             "webp" => OutputFormat::Webp,
                             _ => OutputFormat::Png,
                         };
-                        if let Err(e) = save(&img, &out_path, format) {
+                        if let Err(e) = save(&output.image, &out_path, format) {
                             failed.fetch_add(1, Ordering::Relaxed);
                             emitter.emit(&Event::error(
                                 input_index,
@@ -255,8 +256,8 @@ where
                                 input,
                                 output: &out_path.to_string_lossy(),
                                 duration_ms: t.elapsed().as_millis(),
-                                metrics: Metrics::default(),
-                                warnings: &[],
+                                metrics: output.metrics,
+                                warnings: &output.warnings,
                             });
                         }
                     }
@@ -320,7 +321,10 @@ pub fn upscale(inputs: Vec<String>, format: OutputFormat, common: &CommonArgs) -
         }
         return code;
     }
-    let processor = match ModelProcessor::<UpscalingModel>::new(&model_path("upscale")) {
+    let processor = match ModelOperator::<UpscalingModel>::new(
+        &model_path("upscale"),
+        UpscalingParams::default(),
+    ) {
         Ok(p) => p,
         Err(e) => {
             let message = format!("failed to load model: {e}");
@@ -334,23 +338,20 @@ pub fn upscale(inputs: Vec<String>, format: OutputFormat, common: &CommonArgs) -
             return EXIT_MODEL_MISSING;
         }
     };
-    let params = UpscalingParams::default();
     let ext = format.extension();
 
     run_batch(&emitter, inputs, "upscaled", ext, common, |input| {
         if input == "-" {
             let img = read_stdin_image().map_err(|e| e.to_string())?;
             let tmp = write_temp(&img).map_err(|e| e.to_string())?;
-            let out = processor
-                .process_single(tmp.to_str().unwrap(), &params)
+            let output = processor
+                .process(tmp.to_str().unwrap())
                 .map_err(|e| e.to_string())?;
             std::fs::remove_file(&tmp).ok();
-            write_stdout_image(&out, format).map_err(|e| e.to_string())?;
-            Ok(out)
+            write_stdout_image(&output.image, format).map_err(|e| e.to_string())?;
+            Ok(output)
         } else {
-            processor
-                .process_single(input, &params)
-                .map_err(|e| e.to_string())
+            processor.process(input).map_err(|e| e.to_string())
         }
     })
 }
@@ -379,7 +380,10 @@ pub fn restore(inputs: Vec<String>, common: &CommonArgs) -> u8 {
         }
         return code;
     }
-    let processor = match ModelProcessor::<FaceRestorationModel>::new(&model_path("restore")) {
+    let processor = match ModelOperator::<FaceRestorationModel>::new(
+        &model_path("restore"),
+        FaceRestorationParams::default(),
+    ) {
         Ok(p) => p,
         Err(e) => {
             let message = format!("failed to load model: {e}");
@@ -393,43 +397,20 @@ pub fn restore(inputs: Vec<String>, common: &CommonArgs) -> u8 {
             return EXIT_MODEL_MISSING;
         }
     };
-    let params = FaceRestorationParams::default();
-
     run_batch(&emitter, inputs, "restored", "png", common, |input| {
         if input == "-" {
             let img = read_stdin_image().map_err(|e| e.to_string())?;
             let tmp = write_temp(&img).map_err(|e| e.to_string())?;
-            let out = processor
-                .process_single(tmp.to_str().unwrap(), &params)
+            let output = processor
+                .process(tmp.to_str().unwrap())
                 .map_err(|e| e.to_string())?;
             std::fs::remove_file(&tmp).ok();
-            write_stdout_image(&out, OutputFormat::Png).map_err(|e| e.to_string())?;
-            Ok(out)
+            write_stdout_image(&output.image, OutputFormat::Png).map_err(|e| e.to_string())?;
+            Ok(output)
         } else {
-            processor
-                .process_single(input, &params)
-                .map_err(|e| e.to_string())
+            processor.process(input).map_err(|e| e.to_string())
         }
     })
-}
-
-/// Composite the alpha mask from the model onto the original image.
-fn apply_mask(input: &str, mask: &DynamicImage) -> Result<DynamicImage, String> {
-    let original = image::open(input).map_err(|e| e.to_string())?;
-    let mask = mask.resize_exact(
-        original.width(),
-        original.height(),
-        image::imageops::FilterType::Triangle,
-    );
-    let original_rgba = original.to_rgba8();
-    let mask_rgba = mask.to_rgba8();
-    let mut final_image = image::RgbaImage::new(original.width(), original.height());
-    for (x, y, pixel) in final_image.enumerate_pixels_mut() {
-        let o = original_rgba.get_pixel(x, y);
-        let m = mask_rgba.get_pixel(x, y);
-        *pixel = image::Rgba([o[0], o[1], o[2], m[3]]);
-    }
-    Ok(DynamicImage::ImageRgba8(final_image))
 }
 
 pub fn rembg(
@@ -484,12 +465,14 @@ pub fn rembg(
     let ext = format.extension();
 
     enum P {
-        Fast(ModelProcessor<BackgroundRemovalModel>),
-        High(ModelProcessor<BiRefNetModel>),
+        Fast(BackgroundRemover<BackgroundRemovalModel>),
+        High(BackgroundRemover<BiRefNetModel>),
     }
     let processor = match quality {
-        RembgQuality::Fast => ModelProcessor::new(&model_path(model_name)).map(P::Fast),
-        RembgQuality::High => ModelProcessor::new(&model_path(model_name)).map(P::High),
+        RembgQuality::Fast => {
+            BackgroundRemover::new(&model_path(model_name), params.clone()).map(P::Fast)
+        }
+        RembgQuality::High => BackgroundRemover::new(&model_path(model_name), params).map(P::High),
     };
     let processor = match processor {
         Ok(p) => p,
@@ -515,18 +498,17 @@ pub fn rembg(
             (input.to_string(), None)
         };
 
-        let mask = match &processor {
-            P::Fast(p) => p.process_single(&path, &params),
-            P::High(p) => p.process_single(&path, &params),
+        let output = match &processor {
+            P::Fast(p) => p.process(&path),
+            P::High(p) => p.process(&path),
         }
         .map_err(|e| e.to_string())?;
-        let result = apply_mask(&path, &mask)?;
 
         if let Some(tmp) = tmp {
             std::fs::remove_file(&tmp).ok();
-            write_stdout_image(&result, format).map_err(|e| e.to_string())?;
+            write_stdout_image(&output.image, format).map_err(|e| e.to_string())?;
         }
-        Ok(result)
+        Ok(output)
     })
 }
 
@@ -620,17 +602,13 @@ pub fn segment(input: &str, point: Option<&str>, bbox: Option<&str>, common: &Co
     };
 
     let paths = registry::model_paths(spec);
-    let result = Segmenter::new(&paths[0].to_string_lossy(), &paths[1].to_string_lossy()).and_then(
-        |mut seg| {
-            seg.encode(&image)?;
-            seg.decode(prompt)
-        },
-    );
+    let result = SegmentOperator::new(&paths[0].to_string_lossy(), &paths[1].to_string_lossy())
+        .and_then(|operator| operator.process_image(input, &image, prompt));
 
     match result {
-        Ok(res) => {
+        Ok(output) => {
             let out_path = resolve(input, "mask", "png", common, false);
-            if let Err(e) = res.mask.save(&out_path) {
+            if let Err(e) = output.image.save(&out_path) {
                 emitter.emit(&Event::error(
                     0,
                     input,
@@ -645,11 +623,8 @@ pub fn segment(input: &str, point: Option<&str>, bbox: Option<&str>, common: &Co
                 input,
                 output: &out_path.to_string_lossy(),
                 duration_ms: started.elapsed().as_millis(),
-                metrics: Metrics {
-                    iou: Some(res.iou),
-                    mask_pixels: Some(res.mask_pixels),
-                },
-                warnings: &[],
+                metrics: output.metrics,
+                warnings: &output.warnings,
             });
             emit_single_summary(&emitter, started, 1, 0);
             EXIT_OK
@@ -716,18 +691,13 @@ pub fn erase(input: &str, mask_path: &Path, dilate: u32, common: &CommonArgs) ->
         }
     };
 
-    let mask = if dilate > 0 {
-        dilate_mask(&mask, dilate)
-    } else {
-        mask
-    };
-
-    let result = Eraser::new(&model_path("erase")).and_then(|mut e| e.erase(&image, &mask));
+    let result = EraseOperator::new(&model_path("erase"))
+        .and_then(|operator| operator.process_image(&image, &mask, dilate));
 
     match result {
-        Ok(img) => {
+        Ok(output) => {
             let out_path = resolve(input, "erased", "png", common, false);
-            if let Err(e) = img.save(&out_path) {
+            if let Err(e) = output.image.save(&out_path) {
                 emitter.emit(&Event::error(
                     0,
                     input,
@@ -742,8 +712,8 @@ pub fn erase(input: &str, mask_path: &Path, dilate: u32, common: &CommonArgs) ->
                 input,
                 output: &out_path.to_string_lossy(),
                 duration_ms: started.elapsed().as_millis(),
-                metrics: Metrics::default(),
-                warnings: &[],
+                metrics: output.metrics,
+                warnings: &output.warnings,
             });
             emit_single_summary(&emitter, started, 1, 0);
             EXIT_OK
